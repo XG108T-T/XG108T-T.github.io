@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神秘空间 · 三合一彩蛋</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e2e8f0;
+        }
+        .mystery-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #a78bfa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.5);
+        }
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #cbd5e1;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        
+        /* 抽签区 */
+        .fortune-box {
+            text-align: center;
+            padding: 20px;
+        }
+        .fortune-btn {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px 40px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+        .fortune-btn:active {
+            transform: scale(0.95);
+        }
+        .fortune-result {
+            font-size: 2rem;
+            font-weight: bold;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50px;
+            padding: 15px;
+        }
+        
+        /* 迷宫区 */
+        .game-area {
+            text-align: center;
+        }
+        .scene-desc {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-left: 4px solid #8b5cf6;
+        }
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .choice-btn {
+            background: #334155;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .choice-btn:hover {
+            background: #475569;
+            border-color: #8b5cf6;
+        }
+        .reset-btn {
+            margin-top: 15px;
+            background: transparent;
+            border: 1px dashed #64748b;
+            color: #94a3b8;
+            padding: 10px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        
+        /* 留言区 */
+        .message-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .message-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border-radius: 40px;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: white;
+            font-size: 1rem;
+        }
+        .message-input::placeholder {
+            color: #64748b;
+        }
+        .send-btn {
+            background: #8b5cf6;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .message-wall {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .message-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #334155;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        .empty-message {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* 返回链接 */
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="mystery-container">
+        <h1>✨ 神秘空间 ✨</h1>
+        <p class="subtitle">自制三个彩蛋，一次满足探索佬</p>
+        
+        <!-- 1. 抽签区 -->
+        <div class="card">
+            <div class="card-title">🎲 今日运势抽签</div>
+            <div class="fortune-box">
+                <button class="fortune-btn" id="fortuneBtn">抽一签</button>
+                <div class="fortune-result" id="fortuneResult">✨ 点击抽签 ✨</div>
+            </div>
+        </div>
+        
+        <!-- 2. 迷宫区 -->
+        <div class="card">
+            <div class="card-title">🏰 神秘迷宫</div>
+            <div class="game-area">
+                <div class="scene-desc" id="sceneDesc">你站在一扇古老的大门前...</div>
+                <div class="choices" id="choices"></div>
+                <button class="reset-btn" id="resetGame">🔄 重新开始</button>
+            </div>
+        </div>
+        
+        <!-- 3. 留言区 -->
+        <div class="card">
+            <div class="card-title">💬 匿名留言墙</div>
+            <div class="message-form">
+                <input type="text" class="message-input" id="messageInput" placeholder="留下点什么..." maxlength="50">
+                <button class="send-btn" id="sendMsgBtn">发送</button>
+            </div>
+            <div class="message-wall" id="messageWall">
+                <div class="empty-message">还没有留言，来当第一个吧～</div>
+            </div>
+        </div>
+        
+        <a href="https://xg108t-t.github.io/" class="back-link">← 返回主页</a>
+    </div>
+
+    <script>
+        // ==================== 抽签系统 ====================
+        const fortunes = [
+            "✨ 大吉 ✨ 今天适合加群", 
+            "🍀 小吉 🍀 会遇到好事", 
+            "🌙 末吉 🌙 平淡是福", 
+            "⚡ 凶 ⚡ 小心手机没电",
+            "🌟 吉 🌟 有人正在想你",
+            "💫 中吉 💫 适合尝试新事物",
+            "🎉 大吉 🎉 今晚有彩蛋",
+            "😴 末吉 😴 早点休息",
+            "🔥 小吉 🔥 运气正在上升"
+        ];
+        
+        document.getElementById('fortuneBtn').addEventListener('click', function() {
+            const random = Math.floor(Math.random() * fortunes.length);
+            document.getElementById('fortuneResult').textContent = fortunes[random];
+        });
+        
+        // ==================== 瞎搞的迷宫游戏 ====================
+        const gameStates = {
+            start: {
+                desc: '你站在一扇古老的大门前，门上刻着神秘的符号。',
+                choices: [
+                    { text: '🚪 推开大门', next: 'hall' },
+                    { text: '🔍 仔细观察符号', next: 'symbol' }
+                ]
+            },
+            symbol: {
+                desc: '符号突然发光，你感觉一阵眩晕...',
+                choices: [
+                    { text: '✨ 触碰光芒', next: 'treasure' },
+                    { text: '😨 后退一步', next: 'start' }
+                ]
+            },
+            hall: {
+                desc: '大厅里有两个宝箱，一个金色，一个银色。',
+                choices: [
+                    { text: '📦 打开金色宝箱', next: 'treasure' },
+                    { text: '📦 打开银色宝箱', next: 'monster' },
+                    { text: '🚶 继续前进', next: 'dark' }
+                ]
+            },
+            treasure: {
+                desc: '宝箱里有一张纸条："恭喜你！彩蛋代码：🎉 17580"',
+                choices: [
+                    { text: '🎁 再玩一次', next: 'start' }
+                ]
+            },
+            monster: {
+                desc: '银色宝箱里跳出一个小丑，把你吓了一跳！',
+                choices: [
+                    { text: '🏃 快跑', next: 'start' },
+                    { text: '😱 尖叫', next: 'start' }
+                ]
+            },
+            dark: {
+                desc: '你走进黑暗通道，看到墙上写着："此路不通"',
+                choices: [
+                    { text: '🔙 返回大厅', next: 'hall' }
+                ]
+            }
+        };
+        
+        let currentScene = 'start';
+        
+        function updateGame() {
+            const scene = gameStates[currentScene];
+            document.getElementById('sceneDesc').textContent = scene.desc;
+            
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+            
+            scene.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.text;
+                btn.onclick = () => {
+                    currentScene = choice.next;
+                    updateGame();
+                };
+                choicesDiv.appendChild(btn);
+            });
+        }
+        
+        document.getElementById('resetGame').addEventListener('click', () => {
+            currentScene = 'start';
+            updateGame();
+        });
+        
+        updateGame();
+        
+        // ==================== 留言系统 ===================
+        const STORAGE_KEY = 'mysteryMessages';
+        
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            const wall = document.getElementById('messageWall');
+            
+            if (messages.length === 0) {
+                wall.innerHTML = '<div class="empty-message">还没有留言，来当第一个吧～</div>';
+                return;
+            }
+            
+            wall.innerHTML = messages.map(msg => 
+                `<div class="message-item">💬 ${msg}</div>`
+            ).join('');
+            
+            // 自动滚动到底部
+            wall.scrollTop = wall.scrollHeight;
+        }
+        
+        function addMessage(text) {
+            if (!text.trim()) return;
+            
+            const messages = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            messages.push(text.trim());
+            // 只保留最近50条
+            if (messages.length > 50) messages.shift();
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+            loadMessages();
+        }
+        
+        document.getElementById('sendMsgBtn').addEventListener('click', () => {
+            const input = document.getElementById('messageInput');
+            addMessage(input.value);
+            input.value = '';
+        });
+        
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('sendMsgBtn').click();
+            }
+        });
+        
+        // 加载历史留言
+        loadMessages();
+        
+        // 添加几个示例留言（可选，第一次使用时显示）
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            addMessage('我发现了神秘空间！');
+            addMessage('抽到了大吉 ✨');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏下载 · 安卓版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .download-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            color: #4b5563;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background: #f3f4f6;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .info-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        .download-btn {
+            display: block;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 18px 30px;
+            border-radius: 60px;
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(37,99,235,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 20px;
+        }
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(37,99,235,0.4);
+        }
+        .note {
+            color: #9ca3af;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="download-card">
+        <h1>📱 游戏下载</h1>
+        <p class="subtitle">安卓版本 · 直接安装</p>
+
+        <div class="info-box">
+            <div class="info-item">
+                <span class="info-label">文件名</span>
+                <span class="info-value">VRChat.apk</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">版本</span>
+                <span class="info-value">1.2p2-1802-05d356dd17-Release</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">大小</span>
+                <span class="info-value">284 MB</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">适用系统</span>
+                <span class="info-value">Android 5.0+</span>
+            </div>
+        </div>
+
+        <!-- 下载链接，由星光汇影提供不要手贱删了，要不然就下载不了了 -->
+        <a href="https://github.com/XG108T-T/XG108T-T.github.io/releases/download/%E6%B8%B8%E6%88%8F/VRChat_2026.1.2p2-1802-05d356dd17-Release.zip" class="download-btn">
+            ⬇️ 立即下载
+        </a>
+
+        <b class="note">下载后请在文件管理器中打开安装<br>如果提示“未知来源”，注意如果无法安装，请使用MT管理器。弹窗请允许一次，该下载源由“星光汇影”提供</b><br>
+       <b style="color:#94a3b8; font-size:0.9rem;">
+    📦 文件已压缩，下载后请解压安装<br>
+    原大小约500MB，压缩后约300MB<br>
+    已获取抢先体验版
+</p>
+        <a href="https://xg108t-t.github.io/" class="back-link">← 返回主页</a>
+    </div>
+</body>
+</html>
