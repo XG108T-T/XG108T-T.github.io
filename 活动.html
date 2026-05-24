@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>星光抽奖 · 时间锁 + 一人一次</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03050b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, 'Segoe UI', sans-serif;
+            padding: 16px;
+        }
+        .lottery-container {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(15, 25, 45, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 56px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            border: 1px solid rgba(99,102,241,0.4);
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #e0e7ff, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-bottom: 24px;
+            border-bottom: 1px dashed #334155;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 6px;
+        }
+        .slot-machine {
+            background: #0b1120;
+            border-radius: 48px;
+            padding: 18px 12px;
+            margin: 10px 0 20px;
+            border: 1px solid #2d3a5e;
+        }
+        .track {
+            width: 100%;
+            max-width: 300px;
+            height: 110px;
+            background: #111827;
+            border-radius: 30px;
+            border: 2px solid #4f46e5;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+        .highlight {
+            position: absolute;
+            width: calc(100% - 20px);
+            height: 80px;
+            top: 15px;
+            left: 10px;
+            border: 3px solid #facc15;
+            border-radius: 24px;
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: 0 0 12px rgba(250,204,21,0.6);
+        }
+        .slot-reel {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+        }
+        .item {
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            color: #f1f5f9;
+            border-bottom: 1px solid #334155;
+        }
+        .prize-first { background: linear-gradient(145deg, #ffd966, #f59e0b) !important; color: #2c1a00 !important; }
+        .prize-second { background: linear-gradient(145deg, #cbd5e1, #94a3b8) !important; color: #0f172a !important; }
+        .prize-third { background: linear-gradient(145deg, #cd7f32, #b45309) !important; color: #fff2e5 !important; }
+        .prize-again { background: linear-gradient(145deg, #2dd4bf, #0d9488) !important; color: #042f2e !important; }
+        .prize-none { background: linear-gradient(145deg, #2d3a5e, #1e293b) !important; color: #94a3b8; }
+        .spin-btn { display: flex; justify-content: center; margin: 20px 0 15px; }
+        button {
+            background: linear-gradient(90deg, #4f46e5, #a855f7);
+            border: none;
+            padding: 14px 42px;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        button:active { transform: scale(0.97); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .log-section {
+            background: rgba(0,0,0,0.4);
+            border-radius: 36px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .log-header { font-weight: bold; color: #cbd5e1; margin-bottom: 10px; }
+        .log-list { max-height: 180px; overflow-y: auto; }
+        .log-item {
+            background: #0f172a;
+            margin-bottom: 8px;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            border-left: 3px solid #4f46e5;
+            color: #e2e8f0;
+        }
+        .log-time { font-family: monospace; font-size: 0.7rem; color: #7c8db0; }
+        .prize-win { color: #facc15; font-weight: bold; }
+        .prize-again-color { color: #2dd4bf; font-weight: bold; }
+        .prize-lose { color: #94a3b8; }
+        .glow-text { text-align: center; font-size: 0.7rem; color: #6b7280; margin-top: 16px; }
+        .modal-mask {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 20000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .modal-mask.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: rgba(15,25,45,0.96); backdrop-filter: blur(20px);
+            border: 1px solid #818cf8; border-radius: 48px; padding: 28px 24px;
+            max-width: 340px; width: 85%; text-align: center;
+            transform: scale(0.9); transition: transform 0.2s;
+        }
+        .modal-mask.show .modal-card { transform: scale(1); }
+        .modal-card h3 {
+            font-size: 1.6rem; margin-bottom: 16px;
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .modal-card p { color: #cbd5e1; margin: 12px 0; font-size: 0.9rem; }
+        .modal-card button {
+            background: linear-gradient(90deg, #4f46e5, #a855f7);
+            border: none; padding: 10px 28px; border-radius: 60px;
+            font-size: 1rem; font-weight: bold; color: white;
+            margin-top: 20px; cursor: pointer;
+        }
+        .time-lock {
+            text-align: center;
+            background: #dc2626;
+            border-radius: 40px;
+            padding: 8px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: white;
+        }
+        @media (max-width: 480px) {
+            .item { font-size: 24px; }
+            button { padding: 12px 32px; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="lottery-container">
+    <h1>✨ 星光幸运轮盘 ✨</h1>
+    <div class="sub">每人仅限一次 · 反转惊喜</div>
+    <div class="slot-machine">
+        <div class="track">
+            <div class="highlight"></div>
+            <div class="slot-reel" id="reel">
+                <div class="item">🏆 一等奖</div>
+                <div class="item">🍃 谢谢参与</div>
+                <div class="item">🎁 二等奖</div>
+                <div class="item">🍃 谢谢参与</div>
+                <div class="item">✨ 三等奖</div>
+                <div class="item">🍃 谢谢参与</div>
+                <div class="item">🏆 一等奖</div>
+                <div class="item">🔄 再来一次</div>
+                <div class="item">🎁 二等奖</div>
+                <div class="item">🍃 谢谢参与</div>
+                <div class="item">✨ 三等奖</div>
+            </div>
+        </div>
+    </div>
+    <div class="spin-btn">
+        <button id="spinButton">🔮 抽 奖 🔮</button>
+    </div>
+    <div class="log-section">
+        <div class="log-header">📜 抽奖记录</div>
+        <div class="log-list" id="logList"><div style="color:#475569; text-align:center;">暂无记录</div></div>
+    </div>
+    <div class="glow-text">🎈 中奖请加微信 <strong>看中奖信息</strong> 兑奖</div>
+</div>
+
+<script>
+    (function(){
+        // ========== 配置 ==========
+        const WECHAT_ID = "qp1qp12qp2";
+        // 时间锁配置（活动开始时间）
+        const LOCK_DATE = new Date(2026, 5, 1, 0, 0, 0); // 2026年6月1日 0:00
+        const TEST_MODE = false;  // 正式模式：true=跳过时间锁，false=时间锁生效
+        // 奖项概率
+        const PROB = { first: 0.005, second: 0.01, third: 0.02, again: 0.10 };
+        const PRIZE_INDEX = {
+            "一等奖": [0,6], "二等奖": [2,8], "三等奖": [4,10],
+            "再来一次": [7], "谢谢参与": [1,3,5,9]
+        };
+        const THANK_INDICES = [1,3,5,9];
+        
+        // ========== 设备唯一ID（基于localStorage） ==========
+        function getDeviceId() {
+            let id = localStorage.getItem('star_device_id');
+            if (!id) {
+                id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+                localStorage.setItem('star_device_id', id);
+            }
+            return id;
+        }
+        
+        const STORAGE_KEY = 'star_lottery_locked';
+        
+        function hasDrawn() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return false;
+            try {
+                const data = JSON.parse(raw);
+                return data.deviceId === getDeviceId();
+            } catch(e) { return false; }
+        }
+        
+        function getDrawnPrize() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            try {
+                const data = JSON.parse(raw);
+                if (data.deviceId === getDeviceId()) return data.prize;
+            } catch(e) {}
+            return null;
+        }
+        
+        function saveResult(prize) {
+            const data = {
+                deviceId: getDeviceId(),
+                prize: prize,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            sessionStorage.setItem('star_lottery_backup', JSON.stringify(data));
+            console.log('[锁定] 已保存抽奖结果:', prize);
+        }
+        
+        // 无痕检测
+        function isPrivateMode() {
+            return new Promise((resolve) => {
+                try {
+                    localStorage.setItem('_test_private', '1');
+                    localStorage.removeItem('_test_private');
+                    resolve(false);
+                } catch(e) {
+                    resolve(true);
+                }
+            });
+        }
+        
+        // ========== DOM 元素 ==========
+        const reel = document.getElementById('reel');
+        const spinBtn = document.getElementById('spinButton');
+        const logDiv = document.getElementById('logList');
+        let isSpinning = false;
+        
+        function addLog(prize, isAgain = false) {
+            const time = new Date().toLocaleTimeString();
+            let icon = '', cls = '';
+            if (prize === '一等奖') { icon='🏆'; cls='prize-win'; }
+            else if (prize === '二等奖') { icon='🎁'; cls='prize-win'; }
+            else if (prize === '三等奖') { icon='✨'; cls='prize-win'; }
+            else if (prize === '再来一次') { icon='🔄'; cls='prize-again-color'; }
+            else { icon='🍃'; cls='prize-lose'; }
+            const html = `<div class="log-item"><span class="log-time">${time}</span><span class="${cls}">${icon} ${prize}</span></div>`;
+            if (isAgain) {
+                logDiv.insertAdjacentHTML('beforeend', html);
+            } else {
+                logDiv.innerHTML = html;
+            }
+        }
+        
+        function getRandomPrize() {
+            const r = Math.random();
+            let acc = 0;
+            if (r < PROB.first) return '一等奖';
+            acc += PROB.first;
+            if (r < acc + PROB.second) return '二等奖';
+            acc += PROB.second;
+            if (r < acc + PROB.third) return '三等奖';
+            acc += PROB.third;
+            if (r < acc + PROB.again) return '再来一次';
+            return '谢谢参与';
+        }
+        
+        function getIndexForPrize(prize) {
+            const arr = PRIZE_INDEX[prize];
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        function moveToIndex(index, duration, callback) {
+            const itemHeight = 110;
+            const highlightTop = 15;
+            const targetY = -(index * itemHeight - highlightTop);
+            reel.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.9, 0.3, 1.1)`;
+            reel.style.transform = `translateY(${targetY}px)`;
+            if (callback) setTimeout(callback, duration);
+        }
+        
+        function resetReel() {
+            reel.style.transition = 'none';
+            reel.style.transform = 'translateY(0)';
+            void reel.offsetHeight;
+        }
+        
+        // 主抽奖
+        async function spin() {
+            if (isSpinning) return;
+            
+            // ========== 时间锁检查 ==========
+            if (!TEST_MODE && new Date() < LOCK_DATE) {
+                const year = LOCK_DATE.getFullYear();
+                const month = LOCK_DATE.getMonth() + 1;
+                const day = LOCK_DATE.getDate();
+                alert(`🎁 抽奖活动将于 ${year}年${month}月${day}日 开启，敬请期待！`);
+                return;
+            }
+            
+            // 无痕检测
+            if (await isPrivateMode()) {
+                alert("⚠️ 检测到无痕/隐私模式！请退出后刷新页面再抽奖。");
+                return;
+            }
+            
+            if (hasDrawn()) {
+                alert('您已经参加过本次活动啦！每人仅限一次~');
+                return;
+            }
+            
+            isSpinning = true;
+            spinBtn.disabled = true;
+            spinBtn.innerText = '🎲 命运旋转...';
+            
+            resetReel();
+            await new Promise(r => setTimeout(r, 30));
+            
+            const realPrize = getRandomPrize();
+            const isWin = (realPrize !== '谢谢参与' && realPrize !== '再来一次');
+            const isAgain = (realPrize === '再来一次');
+            const realIndex = getIndexForPrize(realPrize);
+            const needReverse = (isWin || isAgain);
+            
+            if (needReverse) {
+                const fakeIndex = THANK_INDICES[Math.floor(Math.random() * THANK_INDICES.length)];
+                await new Promise(resolve => moveToIndex(fakeIndex, 700, resolve));
+                await new Promise(r => setTimeout(r, 400));
+                await new Promise(resolve => moveToIndex(realIndex, 800, resolve));
+                await new Promise(r => setTimeout(r, 200));
+            } else {
+                await new Promise(resolve => moveToIndex(realIndex, 800, resolve));
+                await new Promise(r => setTimeout(r, 200));
+            }
+            
+            if (isAgain) {
+                addLog(realPrize, true);
+                alert(`🔄 恭喜抽中【再来一次】！你将额外获得一次抽奖机会，请继续抽奖～`);
+                spinBtn.disabled = false;
+                spinBtn.innerText = '🔮 再来一次 🔮';
+                isSpinning = false;
+                return;
+            }
+            
+            saveResult(realPrize);
+            addLog(realPrize, false);
+            spinBtn.disabled = true;
+            if (isWin) {
+                spinBtn.innerText = '🎉 恭喜中奖 🎉';
+                setTimeout(() => {
+                    alert(`🎉 恭喜抽中 ${realPrize} ！\n请添加微信 ${WECHAT_ID} 兑奖 🎉`);
+                }, 300);
+            } else {
+                spinBtn.innerText = '🍀 下次好运 🍀';
+            }
+            isSpinning = false;
+        }
+        
+        // ========== 初始化 ==========
+        async function init() {
+            // 无痕检测
+            if (await isPrivateMode()) {
+                spinBtn.disabled = true;
+                spinBtn.innerText = '🚫 无痕模式不可用';
+                const warn = document.createElement('div');
+                warn.className = 'glow-text';
+                warn.style.color = '#f97316';
+                warn.innerText = '请关闭无痕/隐私模式后刷新页面';
+                document.querySelector('.lottery-container').appendChild(warn);
+                return;
+            }
+            
+            // 时间锁未开启时的倒计时显示（可选，但可增强体验）
+            if (!TEST_MODE && new Date() < LOCK_DATE) {
+                spinBtn.disabled = true;
+                spinBtn.innerText = '⏳ 活动未开启 ⏳';
+                const remainDays = Math.ceil((LOCK_DATE - new Date()) / (1000 * 3600 * 24));
+                const lockDiv = document.createElement('div');
+                lockDiv.className = 'time-lock';
+                lockDiv.innerText = `🔒 活动将于 ${LOCK_DATE.getFullYear()}年${LOCK_DATE.getMonth()+1}月${LOCK_DATE.getDate()}日 开启，剩余 ${remainDays} 天`;
+                document.querySelector('.lottery-container').appendChild(lockDiv);
+                return; // 活动未开始，不继续初始化弹窗
+            }
+            
+            // 已抽过？
+            if (hasDrawn()) {
+                spinBtn.disabled = true;
+                spinBtn.innerText = '✨ 已抽过 ✨';
+                const prize = getDrawnPrize();
+                if (prize) addLog(prize, false);
+                return;
+            }
+            
+            // 未抽过，显示确认弹窗
+            spinBtn.disabled = true;
+            spinBtn.innerText = '🔒 请先阅读须知';
+            
+            const mask = document.createElement('div');
+            mask.className = 'modal-mask';
+            mask.innerHTML = `
+                <div class="modal-card">
+                    <h3>🎁 活动须知</h3>
+                    <p>🔒 每人仅限抽奖一次，抽中【再来一次】可额外再抽。</p>
+                    <p>✨ 中奖会有反转惊喜动画，请耐心等待。</p>
+                    <p>🎲 中奖后请加微信 <strong style="color:#facc15">${WECHAT_ID}</strong> 兑奖。</p>
+                    <p>🔄 点击确认即可开始抽奖，祝你好运！</p>
+                    <button id="confirmBtn">我知道了，开始抽奖</button>
+                </div>
+            `;
+            document.body.appendChild(mask);
+            setTimeout(() => mask.classList.add('show'), 10);
+            
+            const confirmBtn = mask.querySelector('#confirmBtn');
+            confirmBtn.onclick = () => {
+                mask.classList.remove('show');
+                setTimeout(() => mask.remove(), 300);
+                spinBtn.disabled = false;
+                spinBtn.innerText = '🔮 抽 奖 🔮';
+                spinBtn.onclick = spin;
+            };
+        }
+        
+        // 转盘上色
+        function applyColors() {
+            document.querySelectorAll('.item').forEach(el => {
+                const txt = el.innerText.replace(/[🏆🎁✨🔄🍃]/g,'').trim();
+                if (txt === '一等奖') el.classList.add('prize-first');
+                else if (txt === '二等奖') el.classList.add('prize-second');
+                else if (txt === '三等奖') el.classList.add('prize-third');
+                else if (txt === '再来一次') el.classList.add('prize-again');
+                else if (txt === '谢谢参与') el.classList.add('prize-none');
+            });
+        }
+        applyColors();
+        init();
+        
+        console.log('[抽奖系统] 设备ID:', getDeviceId());
+        console.log('[抽奖系统] 是否已抽过:', hasDrawn());
+    })();
+</script>
+</body>
+</html>
