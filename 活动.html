@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>星光抽奖  -   作弊检测</title>
+    <title>星光抽奖 · 作弊检测</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,7 @@
             position: relative;
             overflow-x: hidden;
         }
-        /* 正常抽奖容器样式 (保持不变) */
+        /* 正常抽奖容器样式 */
         .lottery-container {
             max-width: 550px;
             width: 100%;
@@ -32,7 +32,7 @@
             padding: 24px 20px 32px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.5);
             border: 1px solid rgba(99,102,241,0.4);
-            display: none; /* 初始隐藏，通过检测后显示 */
+            display: none;
         }
         h1 {
             text-align: center;
@@ -256,7 +256,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);  /* 半透明，不压抑 */
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
             z-index: 100000;
             display: flex;
@@ -271,7 +271,6 @@
             visibility: visible;
             transition: opacity 0.3s ease, visibility 0s 0s;
         }
-        /* 卡片：毛玻璃 + 微光边框 */
         .modern-card {
             background: rgba(20, 30, 45, 0.8);
             backdrop-filter: blur(20px);
@@ -290,7 +289,6 @@
             transform: scale(1) translateY(0);
             opacity: 1;
         }
-        /* 图标 */
         .modern-icon {
             font-size: 4rem;
             margin-bottom: 20px;
@@ -300,7 +298,6 @@
             background-clip: text;
             color: transparent;
         }
-        /* 标题 */
         .modern-title {
             font-size: 1.8rem;
             font-weight: 600;
@@ -308,14 +305,12 @@
             color: #ffffff;
             letter-spacing: -0.3px;
         }
-        /* 提示文字 */
         .modern-message {
             font-size: 1rem;
             color: #cbd5e1;
             margin-bottom: 32px;
             line-height: 1.5;
         }
-        /* 按钮 */
         .modern-btn {
             background: linear-gradient(90deg, #3b82f6, #8b5cf6);
             border: none;
@@ -340,8 +335,8 @@
 </head>
 <body>
 <div class="lottery-container" id="app">
-    <h1>✨ 星光幸运抽奖 ✨</h1>
-    <div class="sub">每人仅限一次，有大惊喜</div>
+    <h1>✨ 星光幸运轮盘 ✨</h1>
+    <div class="sub">每人仅限一次 · 反转惊喜</div>
     <div class="slot-machine">
         <div class="track">
             <div class="highlight"></div>
@@ -354,19 +349,21 @@
     </div>
     <div class="spin-btn"><button id="spinButton">🔮 抽 奖 🔮</button></div>
     <div class="log-section"><div class="log-header">📜 抽奖记录</div><div class="log-list" id="logList"><div style="color:#475569; text-align:center;">暂无记录</div></div></div>
-    <div class="glow-text">🎈 中奖请加微信 <strong>截图</strong> （V：qp1qp12qp2）兑奖</div>
+    <div class="glow-text">🎈 中奖请加微信 <strong>qp1qp12qp2</strong> 兑奖</div>
 </div>
 <div class="anti-debug">⚡</div>
 
 <script>
     (function(){
-        // ========== 无痕检测（高强度） ==========
+        // ========== 修复后的无痕检测（温和可靠，只检测 localStorage） ==========
         async function isPrivateMode() {
-            try { localStorage.setItem('_t', '1'); localStorage.removeItem('_t'); } catch(e) { return true; }
-            const idbFail = await new Promise(r => { const req = indexedDB.open('_t',1); req.onerror = () => r(true); req.onsuccess = e => { e.target.result.close(); indexedDB.deleteDatabase('_t'); r(false); }; });
-            if(idbFail) return true;
-            try { localStorage.setItem('_big', 'x'.repeat(5*1024*1024)); localStorage.removeItem('_big'); } catch(e) { return true; }
-            return false;
+            try {
+                localStorage.setItem('__test_private', '1');
+                localStorage.removeItem('__test_private');
+                return false;   // 正常模式
+            } catch(e) {
+                return true;    // 无痕模式
+            }
         }
 
         // ========== 现代简洁拦截页面 ==========
@@ -374,28 +371,22 @@
         function showModernBlock() {
             if(trollActive) return;
             trollActive = true;
-            // 创建遮罩层
             const overlay = document.createElement('div');
             overlay.className = 'modern-overlay';
             document.body.appendChild(overlay);
-            
             overlay.innerHTML = `
                 <div class="modern-card">
                     <div class="modern-icon">⚠️</div>
                     <div class="modern-title">访问受限</div>
                     <div class="modern-message">检测到您正在使用无痕/隐私浏览模式。<br>请关闭无痕模式后刷新页面继续。</div>
                     <button class="modern-btn" id="modernReloadBtn">刷新页面</button>
-                    <div class="modern-footer">作弊检测发现作弊</div>
+                    <div class="modern-footer">星光抽奖 · 安全保护</div>
                 </div>
             `;
-            
-            // 入场动画
             setTimeout(() => {
                 overlay.classList.add('active');
-                // 轻振动（可选）
                 if('vibrate' in navigator) navigator.vibrate(100);
             }, 30);
-            
             const btn = document.getElementById('modernReloadBtn');
             if(btn) {
                 btn.addEventListener('click', () => {
@@ -405,7 +396,7 @@
             }
         }
 
-        // 无痕拦截调用
+        // 拦截入口
         async function blockIfPrivate() {
             if(await isPrivateMode()) {
                 showModernBlock();
@@ -414,12 +405,12 @@
             return false;
         }
 
-        // ========== 正常抽奖核心逻辑（完全保留之前版本的抽奖机，没什么改的） ==========
+        // ========== 抽奖核心逻辑（完全保留） ==========
         const CONFIG = {
             wechat: "qp1qp12qp2",
             lockDate: new Date(2026, 5, 1, 0, 0, 0),
             testMode: false,
-            prob: { first: 0.01, second: 0.02, third: 0.04, again: 0.15 }
+            prob: { first: 0.005, second: 0.01, third: 0.02, again: 0.10 }
         };
         const PRIZE_MAP = { "一等奖":[0,6], "二等奖":[2,8], "三等奖":[4,10], "再来一次":[7], "谢谢参与":[1,3,5,9] };
         const THANK_IDX = [1,3,5,9];
@@ -504,7 +495,6 @@
             return null;
         }
 
-        // 抽奖动画逻辑
         const reel = document.getElementById('reel');
         const spinBtn = document.getElementById('spinButton');
         const logDiv = document.getElementById('logList');
@@ -564,7 +554,7 @@
             }
             if(isAgain) {
                 addLog(realPrize,true);
-                alert('🔄 看来你被幸运之神眷顾了…');
+                alert('🔄 看来你被幸运之神眷顾了');
                 spinBtn.disabled=false; spinBtn.innerText='🔮 再来一次 🔮';
                 spinning=false; return;
             }
@@ -579,12 +569,8 @@
         }
 
         async function init() {
-            // 先检测无痕，如果无痕则显示拦截页面，不再继续初始化抽奖
             if(await blockIfPrivate()) return;
-            
-            // 显示抽奖容器
             document.getElementById('app').style.display = 'block';
-            
             if(!CONFIG.testMode && new Date()<CONFIG.lockDate) {
                 spinBtn.disabled=true; spinBtn.innerText='⏳ 活动未开启 ⏳';
                 const days=Math.ceil((CONFIG.lockDate-new Date())/(1000*3600*24));
@@ -616,10 +602,8 @@
             else if(txt==='再来一次') el.classList.add('prize-again');
             else if(txt==='谢谢参与') el.classList.add('prize-none');
         });
-        
         init();
-        
-        // 自检
+
         setInterval(() => {
             if(typeof spin !== 'function' || typeof isLocked !== 'function') location.reload();
         }, 5000);
