@@ -134,7 +134,7 @@
     <h1>✨ 星光投票 ✨</h1>
     <div class="sub">每人仅限一票 · 实时统计</div>
     <div class="user-input">
-        <input type="text" id="userId" placeholder="请输入你的昵称（用于防止重复投票）" autocomplete="off">
+        <input type="text" id="userId" placeholder="请输入你的昵称（用于防止数据重复投票）" autocomplete="off">
     </div>
     <div class="options" id="optionsContainer"></div>
     <div class="stats" id="statsContainer"><div style="text-align:center; color:#94a3b8;">加载票数中...</div></div>
@@ -145,8 +145,8 @@
 </div>
 
 <script>
-    const BACKEND_URL = 'https://script.google.com/macros/s/你的部署ID/exec';
-    const OPTIONS = ['选项A', '选项B', '选项C'];  // 与后端保持一致
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwlu0Rq3TyfBVeuDIE4QFJYg5xsPGcCZeOmkMpixw4yFaFvPXQg1mQFF9dgA4_dspCz/exec';
+    const OPTIONS = ['原版', '新版', '合并'];  // 与后端保持一致
     
     let selectedOption = null;
 
