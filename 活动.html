@@ -62,12 +62,39 @@
         .user-id-input input::placeholder { color: #94a3b8; }
     </style>
 </head>
+<!-- 同意弹窗模块：开始 -->
+<div id="privacyConsent" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100000; display: flex; align-items: center; justify-content: center;">
+    <div style="background: rgba(20,30,45,0.96); border-radius: 48px; padding: 32px 28px; max-width: 340px; width: 85%; text-align: center; border: 1px solid #818cf8; box-shadow: 0 20px 35px rgba(0,0,0,0.3);">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🔐</div>
+        <h3 style="color: #facc15; margin-bottom: 16px;">隐私授权</h3>
+        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 24px;">继续抽奖表示您同意我们收集昵称/QQ号/VX号用于兑奖及防止重复抽奖。您的信息仅用于本次活动，不会外泄。</p>
+        <button id="consentConfirmBtn" style="background: linear-gradient(90deg, #4f46e5, #a855f7); border: none; padding: 12px 28px; border-radius: 60px; font-size: 1rem; font-weight: bold; color: white; cursor: pointer; width: 100%; transition: 0.2s;">同意并继续</button>
+    </div>
+</div>
+<script>
+    (function() {
+        var overlay = document.getElementById('privacyConsent');
+        var confirmBtn = document.getElementById('consentConfirmBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                if (overlay) overlay.style.display = 'none';
+                // 启用抽奖按钮和输入框（如果它们存在且有 disabled 属性）
+                var spinBtn = document.getElementById('spinButton');
+                if (spinBtn) spinBtn.disabled = false;
+                var userIdInput = document.getElementById('userId');
+                if (userIdInput) userIdInput.disabled = false;
+            });
+        }
+        // 如果没有找到按钮，不报错
+    })();
+</script>
+<!-- 同意弹窗模块：结束 -->
 <body>
 <div class="lottery-container" id="app">
     <h1>✨ 星光幸运轮盘 ✨</h1>
     <div class="sub">每人仅限一次 · 试试吧说不定就中了呢</div>
     <div class="user-id-input">
-        <input type="text" id="userId" placeholder="请输入你的昵称+QQ号/VX号（用于领奖，我们会保护您的隐私）" autocomplete="off">
+        <input type="text" id="userId" placeholder="请输入你的昵称+QQ号/VX号（用于领奖我们会保护您的隐私）" autocomplete="off">
     </div>
     <div class="slot-machine">
         <div class="track">
@@ -86,7 +113,7 @@
 
 <script>
     // ==========后段由Google防护==========
-    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxnGBaXhiv790LV4_G_8KEMzjW_HM22XgtPdMeTY9FxijobYKQWv1obQfwCqUZF6hcN/exec';
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzNGiVtR6r4okMFlwwayYtWVXQxuOfFaO2Y7wSL0P2RxlrXxYsawB_1TnyDOmF51w-9/exec';
 
     // 转盘动画相关
     const reel = document.getElementById('reel');
@@ -136,7 +163,7 @@
 
         const userId = userIdInput.value.trim();
         if (!userId) {
-            alert('请先输入你的昵称+QQ号，以便中奖后联系');
+            alert('请先输入你的昵称+QQ号/VX号，以便中奖后联系');
             return;
         }
 
