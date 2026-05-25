@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>社区主页 · 星光汇影</title>
+    <!-- 不蒜子统计 -->
+    <div style="margin-top: 60px; padding: 12px; background: #f3f4f6; border-radius: 30px; text-align: center; color: #4b5563; font-size: 14px; border: 1px solid #e5e7eb;">
+        <span>📊 本站总访问量：<span id="busuanzi_value_site_pv">0</span>次</span>
+        <span style="margin: 0 8px;">|</span>
+        <span>👥 今日访客：<span id="busuanzi_value_site_uv">0</span>人</span>
+    </div>
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #f1f5f9;
+            background: linear-gradient(135deg, #0b1120 0%, #1a1f2e 50%, #0f172a 100%);
+            background-attachment: fixed;
+            padding-top: 70px;
+        }
+
+        /* 动态流动光效 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(37,99,235,0.15), transparent 60%),
+                        radial-gradient(circle at 80% 70%, rgba(124,58,237,0.15), transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        #home, #services, #features, #functions, #contact {
+            scroll-margin-top: 70px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            color: white;
+            padding: 0.8rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #a5f3fc, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        /* Hero 区域 */
+        #hero {
+            background: linear-gradient(125deg, rgba(11,17,32,0.6), rgba(26,31,46,0.8)), url(7801.png) no-repeat center center / cover;
+            height: 90vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        #hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+            filter: brightness(1.05);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .btn-tertiary {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-tertiary:hover {
+            background: white;
+            color: #2563eb;
+        }
+
+        /* 活动按钮特殊样式 */
+        .btn-activity {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            box-shadow: 0 0 12px rgba(245,158,11,0.5);
+        }
+
+        /* 通用区块 */
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a5f3fc, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* 卡片：毛玻璃效果 */
+        .services, .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .service, .feature {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 2rem 1.5rem;
+            border-radius: 24px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .service:hover, .feature:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.4);
+            background: rgba(20, 28, 48, 0.7);
+        }
+
+        .service h3, .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+
+        .service p, .feature p {
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .service .btn, .feature .btn {
+            align-self: flex-start;
+            margin-top: auto;
+        }
+
+        /* 联系区域 */
+        #contact {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #contact .container p, #contact .container b, #contact .container h6 {
+            margin: 0.5rem 0;
+            color: #cbd5e1;
+        }
+
+        #contact .container a {
+            color: #a5f3fc;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                background: rgba(15, 23, 42, 0.95);
+                backdrop-filter: blur(12px);
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                padding: 1rem 0;
+                text-align: center;
+                gap: 0.8rem;
+            }
+            .nav-links.show {
+                display: flex;
+            }
+            #hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+            #hero {
+                background-position: center 25%;
+            }
+        }
+    </style>
+</head>
+<body id="home">
+    <header>
+        <nav class="container">
+            <div class="logo">✨ 加入我们，一起游玩</div>
+            <button class="menu-toggle" aria-label="菜单">☰</button>
+            <ul class="nav-links">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#services">认识我们</a></li>
+                <li><a href="#features">联系</a></li>
+                <li><a href="#functions">更多</a></li>
+                <li><a href="#contact">关于</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="hero">
+        <div class="container hero-content">
+            <h1>✨ 社区</h1>
+            <p>VRC群组 · 虚拟现实爱好者聚集地</p>
+            <div class="hero-buttons">
+                <a href="活动.html" class="btn btn-activity">🎁 限时活动 · 模型折扣 & 抽奖</a>
+                <a href="#services" class="btn">📖 快速了解我们</a>
+                <a href="#functions" class="btn btn-secondary">🚀 未知某某副业</a>
+                <a href="#features" class="btn btn-tertiary">📞 联系我们</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 其余所有板块内容保持不变（认识我们、微笑警告、工具、捐赠、关于） -->
+    <section id="services" class="section">
+        <div class="container">
+            <h2 class="section-title">🤝 认识我们</h2>
+            <div class="services">
+                <div class="service">
+                    <h3>📱 我们的群聊</h3>
+                    <p><a href="31.html" class="btn">加入QQ群聊</a></p>
+                </div>
+                <div class="service">
+                    <h3>👥 我们的团队</h3>
+                    <p>捞爷星光独自承受这破网站…</p>
+                </div>
+                <div class="service">
+                    <h3>🔮 神秘</h3>
+                    <p><a href="神秘.html" class="btn">let it be</a></p>
+                </div>
+                <div class="service">
+                    <h3>💬 为什么要加入Discord群组</h3>
+                    <p>因为QQ人数过多无法维护，如果无法使用了，我们也能使用Discord方便实时通知活动</p>
+                </div>
+                <div class="service">
+                    <h3>📥 注册安装Discord</h3>
+                    <p><a href="https://discord.com/" class="btn">官网下载</a></p>
+                    <p><a href="https://github.com/discord" class="btn">Github下载</a></p>
+                    <p><a href="https://discorbs.com" class="btn">国内下载</a></p>
+                </div>
+                <div class="service">
+                    <h3>🔗 加入Discord</h3>
+                    <p><a href="https://discord.gg/UwzmA4zpc" class="btn">加入</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="section">
+        <div class="container">
+            <h2 class="section-title">⚠️ 微笑是一种警告</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>📺 BV号 · 投稿地</h3>
+                    <p><a href="https://space.bilibili.com/3706938588138188" class="btn" target="_blank">我要投稿！</a></p>
+                </div>
+                <div class="feature">
+                    <h3>📧 邮箱联系</h3>
+                    <p>欢迎反馈模型问题</p>
+                    <p><a href="无项目.html" class="btn">安全问题暂不提供</a></p>
+                </div>
+                <div class="feature">
+                    <h3>📦 VRChat官网</h3>
+                    <p>先去官网注册账号再下载游戏/可以游客游玩</p>
+                    <p><a href="https://vrchat.com/home" class="btn">前往</a></p>
+                </div>
+                <div class="feature">
+                    <h3>📦 VRChat下载</h3>
+                    <p>PC、安卓、一体机下载源</p>
+                    <p><a href="https://store.steampowered.com/app/438100/VRChat/" class="btn">PC</a></p>
+                    <p><a href="安卓下载源.html" class="btn">安卓</a></p>
+                    <p><a href="https://files.vrcat.icu/" class="btn">一体机</a></p>
+                </div>
+                <div class="feature">
+                    <h3>🤔 为什么没有东西</h3>
+                    <p>因为我tm也不知道放什么…</p>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="section-title">🛠 工具提供</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>🛠 WARP</h3>
+                    <p>电脑端改ip软件，免费，访问国外网站/Unity/上传模型很好用。</p>
+                    <a href="https://one.one.one.one/" class="btn">下载</a>
+                </div>
+                <div class="feature">
+                    <h3>📦 unity编辑器</h3>
+                    <p>推荐使用WARP访问国际版下载，避免特供版。</p>
+                    <p><a href="https://unity.com/cn/products/unity-personal" class="btn">外国下载</a></p>
+                    <p><a href="无项目.html" class="btn">国内下载</a></p>
+                    <p><a href="无项目.html" class="btn">网盘下载</a></p>
+                </div>
+                <div class="feature">
+                    <h3>🤓 交给你们了</h3>
+                    <p>还有一些什么好用的工具呢？可以投稿😋</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="functions" class="section">
+        <div class="container">
+            <h2 class="section-title">💰 捐赠</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>🔍 支持我们</h3>
+                    <p>我们无偿提供服务，自愿捐赠。更希望你用这些钱去买零食或自己喜欢的东西。</p>
+                    <a href="支持.html" class="btn">捐赠</a>
+                </div>
+                <div class="feature">
+                    <h3>💤 无数据的话请等待探索</h3>
+                    <p>我要思考先一会，算了我困了睡觉去了</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <div class="container">
+            <h1>该网站代码免费公开使用<br>Github搜索 <big>“XG108”</big></h1>
+            <b>允许复制使用，仅需更改内容即可为你的群组建立网站（禁止商业化！）</b>
+            <b>该网站无任何安全措施，如果无法访问请稍等，也请不要过度访问</b>
+            <p>网站由“星光汇影”维护，部分链接失效请反馈，有问题直接达斯🥰即可</p>
+            <h6>网站版本1.0测试版</h6>
+            <a href="维护.html">维护日志</a>
+        </div>
+    </section>
+
+    <!-- 彩蛋脚本（全部保留，仅整理） -->
+    <script>
+        (function() {
+            const toggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            if (toggle && navLinks) {
+                toggle.addEventListener('click', () => navLinks.classList.toggle('show'));
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => navLinks.classList.remove('show'));
+                });
+            }
+        })();
+
+        console.log('%c🎮 欢迎来到隐藏世界！', 'font-size:16px; color: #a5f3fc; font-weight:bold');
+        console.log('%c📱 QQ群: 1064117555', 'background:#2563eb; color:white; padding:2px 6px; border-radius:4px;');
+
+        // 点击Logo彩蛋（5次复制群号）
+        (function() {
+            const logo = document.querySelector('.logo');
+            if (!logo) return;
+            let count = 0, timer = null;
+            const GROUP = '1064117555';
+            function copy(text) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+            function showMsg(msg) {
+                let div = document.createElement('div');
+                div.innerText = msg;
+                div.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#2563eb; color:white; padding:8px 20px; border-radius:40px; z-index:9999;';
+                document.body.appendChild(div);
+                setTimeout(() => div.remove(), 2000);
+            }
+            logo.addEventListener('click', () => {
+                count++;
+                if (timer) clearTimeout(timer);
+                if (count >= 5) {
+                    copy(GROUP);
+                    showMsg('🎉 群号已复制！');
+                    count = 0;
+                } else {
+                    timer = setTimeout(() => count = 0, 3000);
+                }
+            });
+        })();
+
+        // 滚动底部彩蛋
+        (function() {
+            let bottomFlag = false;
+            window.addEventListener('scroll', () => {
+                if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 100 && !bottomFlag) {
+                    bottomFlag = true;
+                    let msg = document.createElement('div');
+                    msg.innerText = '哦吼吼吼吼…到底了……';
+                    msg.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#7c3aed; color:white; padding:8px 20px; border-radius:40px; z-index:9999;';
+                    document.body.appendChild(msg);
+                    setTimeout(() => msg.remove(), 2500);
+                    setTimeout(() => bottomFlag = false, 10000);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

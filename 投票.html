@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>星光投票 · 实时统计</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03050b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', system-ui, sans-serif;
+            padding: 16px;
+        }
+        .vote-container {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(15, 25, 45, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 56px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            border: 1px solid rgba(99,102,241,0.4);
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #e0e7ff, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-bottom: 24px;
+            border-bottom: 1px dashed #334155;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 6px;
+        }
+        .user-input {
+            margin: 20px 0;
+        }
+        .user-input input {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 60px;
+            border: 1px solid #4f46e5;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        .user-input input::placeholder {
+            color: #94a3b8;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+        .option-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #4f46e5;
+            border-radius: 60px;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+            min-width: 120px;
+        }
+        .option-btn:hover {
+            background: #4f46e5;
+            transform: scale(1.02);
+        }
+        .stats {
+            background: rgba(0,0,0,0.4);
+            border-radius: 36px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 1rem;
+        }
+        .stat-label {
+            color: #cbd5e1;
+        }
+        .stat-count {
+            color: #facc15;
+            font-weight: bold;
+        }
+        .vote-btn {
+            background: linear-gradient(90deg, #4f46e5, #a855f7);
+            width: 100%;
+            margin-top: 15px;
+            border: none;
+            padding: 14px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .vote-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #c084fc;
+        }
+    </style>
+</head>
+<body>
+<div class="vote-container">
+    <h1>✨ 星光投票 ✨</h1>
+    <div class="sub">每人仅限一票 · 实时统计</div>
+    <div class="user-input">
+        <input type="text" id="userId" placeholder="请输入你的昵称（用于防止重复投票）" autocomplete="off">
+    </div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="stats" id="statsContainer"><div style="text-align:center; color:#94a3b8;">加载票数中...</div></div>
+    <button id="voteBtn" class="vote-btn" disabled>请先选择一个选项</button>
+    <div class="message" id="message"></div>
+    <div style="text-align: center; margin-top: 24px;">
+    <a href="index2.html" target="_blank" style="display: inline-block; background: rgba(30, 41, 59, 0.8); border: 1px solid #4f46e5; border-radius: 40px; padding: 10px 20px; color: white; text-decoration: none; font-size: 0.9rem; transition: 0.2s;"> 预览新网页 </a>
+</div>
+
+<script>
+    const BACKEND_URL = 'https://script.google.com/macros/s/你的部署ID/exec';
+    const OPTIONS = ['选项A', '选项B', '选项C'];  // 与后端保持一致
+    
+    let selectedOption = null;
+
+    async function fetchStats() {
+        try {
+            const response = await fetch(BACKEND_URL + '?action=getStats');
+            const data = await response.json();
+            if (data.counts) renderStats(data.counts);
+        } catch (err) {
+            console.error('获取票数失败', err);
+        }
+    }
+
+    function renderStats(counts) {
+        const statsDiv = document.getElementById('statsContainer');
+        if (!counts) return;
+        let html = '';
+        for (let [opt, count] of Object.entries(counts)) {
+            html += `<div class="stat-item">
+                        <span class="stat-label">${opt}</span>
+                        <span class="stat-count">${count} 票</span>
+                    </div>`;
+        }
+        statsDiv.innerHTML = html;
+    }
+
+    async function vote() {
+        const userId = document.getElementById('userId').value.trim();
+        if (!userId) {
+            alert('请先填写你的昵称');
+            return;
+        }
+        if (!selectedOption) {
+            alert('请先选择一个选项');
+            return;
+        }
+        const btn = document.getElementById('voteBtn');
+        btn.disabled = true;
+        btn.textContent = '投票中...';
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({
+                    userId: userId,
+                    option: selectedOption,
+                    version: 'v1'
+                })
+            });
+            const result = await response.json();
+            if (result.error) {
+                document.getElementById('message').innerHTML = `<span style="color:#ff8888">${result.error}</span>`;
+                btn.disabled = false;
+                btn.textContent = '投票';
+                return;
+            }
+            if (result.success) {
+                document.getElementById('message').innerHTML = `<span style="color:#88ff88">${result.message}</span>`;
+                renderStats(result.counts);
+                btn.disabled = true;
+                btn.textContent = '已投票';
+            }
+        } catch (err) {
+            alert('网络错误，请稍后重试（很抱歉，由于我们使用的是谷歌服务，可能会导致您无法投票，十分的抱歉）');
+            btn.disabled = false;
+            btn.textContent = '投票';
+        }
+    }
+
+    function initOptions() {
+        const container = document.getElementById('optionsContainer');
+        OPTIONS.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => {
+                document.querySelectorAll('.option-btn').forEach(b => b.style.background = 'rgba(30, 41, 59, 0.8)');
+                btn.style.background = '#4f46e5';
+                selectedOption = opt;
+                document.getElementById('voteBtn').disabled = false;
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    window.onload = () => {
+        initOptions();
+        fetchStats();
+        document.getElementById('voteBtn').onclick = vote;
+    };
+  
+</script>
+</body>
+</html>
