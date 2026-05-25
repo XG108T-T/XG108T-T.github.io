@@ -3,24 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>星光抽奖 · 最终防护版</title>
+    <title>星光抽奖 · 来试试你的运气吧！</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body {
             min-height: 100vh;
             background: radial-gradient(circle at 20% 30%, #0a0f1e, #03050b);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             padding: 16px;
         }
-        /* 正常抽奖容器 */
         .lottery-container {
             max-width: 550px;
             width: 100%;
@@ -31,261 +25,50 @@
             box-shadow: 0 25px 45px rgba(0,0,0,0.5);
             border: 1px solid rgba(99,102,241,0.4);
         }
-        h1 {
-            text-align: center;
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, #e0e7ff, #c084fc);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .sub {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 0.8rem;
-            margin-bottom: 24px;
-            border-bottom: 1px dashed #334155;
-            display: inline-block;
-            width: auto;
-            margin-left: auto;
-            margin-right: auto;
-            padding-bottom: 6px;
-        }
-        .slot-machine {
-            background: #0b1120;
-            border-radius: 48px;
-            padding: 18px 12px;
-            margin: 10px 0 20px;
-            border: 1px solid #2d3a5e;
-        }
-        .track {
-            width: 100%;
-            max-width: 300px;
-            height: 110px;
-            background: #111827;
-            border-radius: 30px;
-            border: 2px solid #4f46e5;
-            overflow: hidden;
-            position: relative;
-            margin: 0 auto;
-        }
-        .highlight {
-            position: absolute;
-            width: calc(100% - 20px);
-            height: 80px;
-            top: 15px;
-            left: 10px;
-            border: 3px solid #facc15;
-            border-radius: 24px;
-            pointer-events: none;
-            z-index: 10;
-            box-shadow: 0 0 12px rgba(250,204,21,0.6);
-        }
-        .slot-reel {
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-        }
-        .item {
-            height: 110px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            color: #f1f5f9;
-            border-bottom: 1px solid #334155;
-        }
+        h1 { text-align: center; font-size: 1.8rem; background: linear-gradient(135deg, #e0e7ff, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sub { text-align: center; color: #94a3b8; font-size: 0.8rem; margin-bottom: 24px; border-bottom: 1px dashed #334155; display: inline-block; width: auto; margin-left: auto; margin-right: auto; padding-bottom: 6px; }
+        .slot-machine { background: #0b1120; border-radius: 48px; padding: 18px 12px; margin: 10px 0 20px; border: 1px solid #2d3a5e; }
+        .track { width: 100%; max-width: 300px; height: 110px; background: #111827; border-radius: 30px; border: 2px solid #4f46e5; overflow: hidden; position: relative; margin: 0 auto; }
+        .highlight { position: absolute; width: calc(100% - 20px); height: 80px; top: 15px; left: 10px; border: 3px solid #facc15; border-radius: 24px; pointer-events: none; z-index: 10; box-shadow: 0 0 12px rgba(250,204,21,0.6); }
+        .slot-reel { display: flex; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+        .item { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; background: linear-gradient(145deg, #1e293b, #0f172a); color: #f1f5f9; border-bottom: 1px solid #334155; }
         .prize-first { background: linear-gradient(145deg, #ffd966, #f59e0b) !important; color: #2c1a00 !important; }
         .prize-second { background: linear-gradient(145deg, #cbd5e1, #94a3b8) !important; color: #0f172a !important; }
         .prize-third { background: linear-gradient(145deg, #cd7f32, #b45309) !important; color: #fff2e5 !important; }
         .prize-again { background: linear-gradient(145deg, #2dd4bf, #0d9488) !important; color: #042f2e !important; }
         .prize-none { background: linear-gradient(145deg, #2d3a5e, #1e293b) !important; color: #94a3b8; }
-        .spin-btn {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0 15px;
-        }
-        button {
-            background: linear-gradient(90deg, #4f46e5, #a855f7);
-            border: none;
-            padding: 14px 42px;
-            border-radius: 60px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: 0.1s;
-        }
+        .spin-btn { display: flex; justify-content: center; margin: 20px 0 15px; }
+        button { background: linear-gradient(90deg, #4f46e5, #a855f7); border: none; padding: 14px 42px; border-radius: 60px; font-size: 1.3rem; font-weight: bold; color: white; cursor: pointer; transition: 0.1s; }
         button:active { transform: scale(0.97); }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .log-section {
-            background: rgba(0,0,0,0.4);
-            border-radius: 36px;
-            padding: 16px;
-            margin-top: 16px;
-        }
-        .log-header {
-            font-weight: bold;
-            color: #cbd5e1;
-            margin-bottom: 10px;
-        }
-        .log-list {
-            max-height: 180px;
-            overflow-y: auto;
-        }
-        .log-item {
-            background: #0f172a;
-            margin-bottom: 8px;
-            padding: 8px 14px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            display: flex;
-            justify-content: space-between;
-            border-left: 3px solid #4f46e5;
-            color: #e2e8f0;
-        }
-        .log-time {
-            font-family: monospace;
-            font-size: 0.7rem;
-            color: #7c8db0;
-        }
+        .log-section { background: rgba(0,0,0,0.4); border-radius: 36px; padding: 16px; margin-top: 16px; }
+        .log-header { font-weight: bold; color: #cbd5e1; margin-bottom: 10px; }
+        .log-list { max-height: 180px; overflow-y: auto; }
+        .log-item { background: #0f172a; margin-bottom: 8px; padding: 8px 14px; border-radius: 40px; font-size: 0.8rem; display: flex; justify-content: space-between; border-left: 3px solid #4f46e5; color: #e2e8f0; }
+        .log-time { font-family: monospace; font-size: 0.7rem; color: #7c8db0; }
         .prize-win { color: #facc15; font-weight: bold; }
         .prize-again-color { color: #2dd4bf; font-weight: bold; }
         .prize-lose { color: #94a3b8; }
-        .glow-text {
-            text-align: center;
-            font-size: 0.7rem;
-            color: #6b7280;
-            margin-top: 16px;
-        }
-        .modal-mask {
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
-            z-index: 20000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-        .modal-mask.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .modal-card {
-            background: rgba(15,25,45,0.96);
-            backdrop-filter: blur(20px);
-            border: 1px solid #818cf8;
-            border-radius: 48px;
-            padding: 28px 24px;
-            max-width: 340px;
-            width: 85%;
-            text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.2s;
-        }
-        .modal-mask.show .modal-card {
-            transform: scale(1);
-        }
-        .modal-card h3 {
-            font-size: 1.6rem;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #facc15, #f59e0b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .modal-card p {
-            color: #cbd5e1;
-            margin: 12px 0;
-            font-size: 0.9rem;
-        }
-        .modal-card button {
-            background: linear-gradient(90deg, #4f46e5, #a855f7);
-            border: none;
-            padding: 10px 28px;
-            border-radius: 60px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: white;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-        /* 拦截页面样式 */
-        .block-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(12px);
-            z-index: 100000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .block-card {
-            background: rgba(20, 30, 45, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 56px;
-            border: 2px solid #ff4444;
-            box-shadow: 0 0 60px rgba(255,0,0,0.3);
-            padding: 40px 32px;
-            max-width: 420px;
-            width: 85%;
-            text-align: center;
-        }
-        .block-icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
-        }
-        .block-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: #ff6666;
-        }
-        .block-message {
-            font-size: 1rem;
-            color: #e2e8f0;
-            margin-bottom: 32px;
-            line-height: 1.5;
-        }
-        .block-btn {
-            background: linear-gradient(90deg, #ff4d4d, #b91c1c);
-            border: none;
-            padding: 14px 32px;
-            border-radius: 60px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .block-btn:active {
-            transform: scale(0.96);
-        }
-        @media (max-width: 480px) {
-            .item { font-size: 24px; }
-            button { padding: 12px 32px; font-size: 1.1rem; }
-        }
+        .glow-text { text-align: center; font-size: 0.7rem; color: #6b7280; margin-top: 16px; }
+        .modal-mask { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 20000; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .modal-mask.show { opacity: 1; pointer-events: auto; }
+        .modal-card { background: rgba(15,25,45,0.96); backdrop-filter: blur(20px); border: 1px solid #818cf8; border-radius: 48px; padding: 28px 24px; max-width: 340px; width: 85%; text-align: center; transform: scale(0.9); transition: transform 0.2s; }
+        .modal-mask.show .modal-card { transform: scale(1); }
+        .modal-card h3 { font-size: 1.6rem; margin-bottom: 16px; background: linear-gradient(135deg, #facc15, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .modal-card p { color: #cbd5e1; margin: 12px 0; font-size: 0.9rem; }
+        .modal-card button { background: linear-gradient(90deg, #4f46e5, #a855f7); border: none; padding: 10px 28px; border-radius: 60px; font-size: 1rem; font-weight: bold; color: white; margin-top: 20px; cursor: pointer; }
+        .user-id-input { margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .user-id-input input { flex: 1; min-width: 200px; padding: 12px 20px; border-radius: 60px; border: 1px solid #4f46e5; background: rgba(0,0,0,0.5); color: white; font-size: 1rem; outline: none; }
+        .user-id-input input::placeholder { color: #94a3b8; }
     </style>
 </head>
 <body>
 <div class="lottery-container" id="app">
     <h1>✨ 星光幸运轮盘 ✨</h1>
-    <div class="sub">每人仅限一次 · 反转惊喜</div>
+    <div class="sub">每人仅限一次 · 试试吧说不定就中了呢</div>
+    <div class="user-id-input">
+        <input type="text" id="userId" placeholder="请输入你的昵称+QQ号/VX号（用于领奖，我们会保护您的隐私）" autocomplete="off">
+    </div>
     <div class="slot-machine">
         <div class="track">
             <div class="highlight"></div>
@@ -302,243 +85,141 @@
 </div>
 
 <script>
-    // ========== 最强制拦截：同步检测无痕模式 ==========
-    (function() {
-        // 检测函数（同步，不依赖任何外部库）
-        function isPrivateMode() {
-            // 1. localStorage 写入测试
-            try {
-                localStorage.setItem('__test_private', '1');
-                localStorage.removeItem('__test_private');
-            } catch(e) {
-                return true;
-            }
-            // 2. IndexedDB 打开测试
-            let db = null;
-            try {
-                const request = indexedDB.open('__test_idb', 1);
-                request.onerror = function() { db = false; };
-                request.onsuccess = function(e) {
-                    db = e.target.result;
-                    db.close();
-                    indexedDB.deleteDatabase('__test_idb');
-                };
-                // 简单同步等待（最多50ms）
-                const start = Date.now();
-                while(Date.now() - start < 50 && db === null) {}
-                if(db === false) return true;
-            } catch(e) {
-                return true;
-            }
-            return false;
+    // ==========后段由Google防护==========
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxnGBaXhiv790LV4_G_8KEMzjW_HM22XgtPdMeTY9FxijobYKQWv1obQfwCqUZF6hcN/exec';
+
+    // 转盘动画相关
+    const reel = document.getElementById('reel');
+    const spinBtn = document.getElementById('spinButton');
+    const logDiv = document.getElementById('logList');
+    const userIdInput = document.getElementById('userId');
+    let spinning = false;
+
+    const PRIZE_INDEX = {
+        "一等奖": [0,6],
+        "二等奖": [2,8],
+        "三等奖": [4,10],
+        "再来一次": [7],
+        "谢谢参与": [1,3,5,9]
+    };
+    const THANK_INDICES = [1,3,5,9];
+
+    function addLog(prize, isAgain = false) {
+        const time = new Date().toLocaleTimeString();
+        let icon = '', cls = '';
+        if (prize === '一等奖') { icon='🏆'; cls='prize-win'; }
+        else if (prize === '二等奖') { icon='🎁'; cls='prize-win'; }
+        else if (prize === '三等奖') { icon='✨'; cls='prize-win'; }
+        else if (prize === '再来一次') { icon='🔄'; cls='prize-again-color'; }
+        else { icon='🍃'; cls='prize-lose'; }
+        const html = `<div class="log-item"><span class="log-time">${time}</span><span class="${cls}">${icon} ${prize}</span></div>`;
+        if (isAgain) logDiv.insertAdjacentHTML('beforeend', html);
+        else logDiv.innerHTML = html;
+    }
+
+    function moveToIndex(idx, duration, callback) {
+        const itemHeight = 110, highlightTop = 15;
+        const targetY = -(idx * itemHeight - highlightTop);
+        reel.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.9, 0.3, 1.1)`;
+        reel.style.transform = `translateY(${targetY}px)`;
+        if (callback) setTimeout(callback, duration);
+    }
+
+    function resetReel() {
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
+        void reel.offsetHeight;
+    }
+
+    async function spin() {
+        if (spinning) return;
+
+        const userId = userIdInput.value.trim();
+        if (!userId) {
+            alert('请先输入你的昵称+QQ号，以便中奖后联系');
+            return;
         }
 
-        // 如果是无痕模式，立即清空页面并显示拦截界面
-        if(isPrivateMode()) {
-            document.body.innerHTML = `
-                <div class="block-overlay">
-                    <div class="block-card">
-                        <div class="block-icon">🚫</div>
-                        <div class="block-title">访问被拒绝</div>
-                        <div class="block-message">检测到您正在使用无痕/隐私浏览模式。<br>请关闭无痕模式后刷新页面。</div>
-                        <button class="block-btn" id="blockReloadBtn">刷新页面</button>
-                    </div>
-                </div>
-            `;
-            const btn = document.getElementById('blockReloadBtn');
-            if(btn) btn.onclick = () => location.reload();
-            // 终止后续所有代码执行
-            throw new Error('Private mode detected');
-        }
-    })();
+        spinning = true;
+        spinBtn.disabled = true;
+        spinBtn.innerText = '🎲 连接服务器...';
 
-    // ========== 正常抽奖逻辑（无痕模式下不会执行到这里） ==========
-    (function() {
-        // 配置（已去除时间锁，抽奖立即可用）
-        const CONFIG = {
-            wechat: "qp1qp12qp2",
-            prob: { first: 0.015, second: 0.025, third: 0.045, again: 0.18 }
-        };
-        const PRIZE_MAP = { "一等奖":[0,6], "二等奖":[2,8], "三等奖":[4,10], "再来一次":[7], "谢谢参与":[1,3,5,9] };
-        const THANK_IDX = [1,3,5,9];
-
-        // 设备指纹
-        function getFingerprint() {
-            let fp = localStorage.getItem('_fp_x');
-            if(fp) return fp;
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.textBaseline = "top";
-            ctx.font = "18px Arial";
-            ctx.fillStyle = "#f60";
-            ctx.fillRect(0,0,100,30);
-            ctx.fillStyle = "#069";
-            ctx.fillText("⭐",5,10);
-            const data = canvas.toDataURL();
-            const nav = navigator;
-            const str = [
-                nav.userAgent, nav.language, nav.platform,
-                screen.width, screen.height, screen.colorDepth,
-                new Date().getTimezoneOffset(),
-                !!nav.hardwareConcurrency, nav.deviceMemory || '',
-                data, 'salt2026'
-            ].join('|');
-            let hash = 0;
-            for(let i=0;i<str.length;i++) hash = ((hash<<5)-hash)+str.charCodeAt(i);
-            fp = 'fp_'+Math.abs(hash).toString(36);
-            localStorage.setItem('_fp_x', fp);
-            return fp;
-        }
-
-        // 存储锁定（一人一次）
-        async function saveLock(prize) {
-            const fp = getFingerprint();
-            const data = { fp, prize, t: Date.now(), v:5 };
-            localStorage.setItem('_lock_main', JSON.stringify(data));
-            sessionStorage.setItem('_lock_back', JSON.stringify(data));
-            return new Promise(resolve => {
-                const req = indexedDB.open('_lockDB', 1);
-                req.onupgradeneeded = e => { if(!e.target.result.objectStoreNames.contains('lock')) e.target.result.createObjectStore('lock',{keyPath:'fp'}); };
-                req.onsuccess = e => {
-                    const db = e.target.result;
-                    if(db.objectStoreNames.contains('lock')) {
-                        const tx = db.transaction('lock','readwrite');
-                        tx.objectStore('lock').put(data);
-                        tx.oncomplete = () => resolve();
-                    } else resolve();
-                };
-                req.onerror = () => resolve();
+        let result;
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({ userId: userId, version: 'v1' })
             });
+            result = await response.json();
+        } catch (err) {
+            alert('网络错误，请稍后重试（抱歉我们使用的是Google服务可能会导致您无法抽奖，中奖后可截图联系我（V：qp1qp12qp2）');
+            spinning = false;
+            spinBtn.disabled = false;
+            spinBtn.innerText = '🔮 抽 奖 🔮';
+            return;
         }
 
-        async function isLocked() {
-            const fp = getFingerprint();
-            let raw = localStorage.getItem('_lock_main');
-            if(raw) try { let d=JSON.parse(raw); if(d.fp===fp && d.v===5) return true; } catch(e){}
-            raw = sessionStorage.getItem('_lock_back');
-            if(raw) try { let d=JSON.parse(raw); if(d.fp===fp && d.v===5) { localStorage.setItem('_lock_main',raw); return true; } } catch(e){}
-            return new Promise(resolve => {
-                const req = indexedDB.open('_lockDB',1);
-                req.onsuccess = e => {
-                    const db = e.target.result;
-                    if(!db.objectStoreNames.contains('lock')) { resolve(false); return; }
-                    const tx = db.transaction('lock','readonly');
-                    const get = tx.objectStore('lock').get(fp);
-                    get.onsuccess = () => {
-                        if(get.result) {
-                            localStorage.setItem('_lock_main',JSON.stringify(get.result));
-                            sessionStorage.setItem('_lock_back',JSON.stringify(get.result));
-                            resolve(true);
-                        } else resolve(false);
-                    };
-                    get.onerror = () => resolve(false);
-                };
-                req.onerror = () => resolve(false);
-            });
+        if (result.error) {
+            alert(result.error);
+            spinning = false;
+            spinBtn.disabled = false;
+            spinBtn.innerText = '🔮 抽 奖 🔮';
+            return;
         }
 
-        async function getLockedPrize() {
-            const fp = getFingerprint();
-            const raw = localStorage.getItem('_lock_main');
-            if(raw) try { let d=JSON.parse(raw); if(d.fp===fp) return d.prize; } catch(e){}
-            return null;
+        const realPrize = result.prize;
+        const isAgain = (realPrize === '再来一次');
+        const isWin = (realPrize !== '谢谢参与' && realPrize !== '再来一次');
+        const indices = PRIZE_INDEX[realPrize];
+        const targetIndex = indices[Math.floor(Math.random() * indices.length)];
+
+        spinBtn.innerText = '🎲 命运旋转...';
+        resetReel();
+        await new Promise(r => setTimeout(r, 30));
+
+        if (isWin || isAgain) {
+            const fakeIndex = THANK_INDICES[Math.floor(Math.random() * THANK_INDICES.length)];
+            await new Promise(r => moveToIndex(fakeIndex, 700, r));
+            await new Promise(r => setTimeout(r, 400));
+            await new Promise(r => moveToIndex(targetIndex, 800, r));
+            await new Promise(r => setTimeout(r, 200));
+        } else {
+            await new Promise(r => moveToIndex(targetIndex, 800, r));
+            await new Promise(r => setTimeout(r, 200));
         }
 
-        const reel = document.getElementById('reel');
-        const spinBtn = document.getElementById('spinButton');
-        const logDiv = document.getElementById('logList');
-        let spinning = false;
-
-        function addLog(prize, isAgain=false) {
-            const time = new Date().toLocaleTimeString();
-            let icon='',cls='';
-            if(prize==='一等奖') { icon='🏆'; cls='prize-win'; }
-            else if(prize==='二等奖') { icon='🎁'; cls='prize-win'; }
-            else if(prize==='三等奖') { icon='✨'; cls='prize-win'; }
-            else if(prize==='再来一次') { icon='🔄'; cls='prize-again-color'; }
-            else { icon='🍃'; cls='prize-lose'; }
-            const html = `<div class="log-item"><span class="log-time">${time}</span><span class="${cls}">${icon} ${prize}</span></div>`;
-            if(isAgain) logDiv.insertAdjacentHTML('beforeend', html);
-            else logDiv.innerHTML = html;
+        if (isAgain) {
+            addLog(realPrize, true);
+            alert(`🔄 恭喜抽中【再来一次】！你将额外获得一次抽奖机会，请继续抽奖～`);
+            spinBtn.disabled = false;
+            spinBtn.innerText = '🔮 再来一次 🔮';
+            spinning = false;
+            return;
         }
 
-        function getRandomPrize() {
-            const r = Math.random();
-            let acc=0;
-            if(r<CONFIG.prob.first) return '一等奖';
-            acc+=CONFIG.prob.first;
-            if(r<acc+CONFIG.prob.second) return '二等奖';
-            acc+=CONFIG.prob.second;
-            if(r<acc+CONFIG.prob.third) return '三等奖';
-            acc+=CONFIG.prob.third;
-            if(r<acc+CONFIG.prob.again) return '再来一次';
-            return '谢谢参与';
+        addLog(realPrize, false);
+        spinBtn.disabled = true;
+        if (isWin) {
+            spinBtn.innerText = '🎉 恭喜中奖 🎉';
+            setTimeout(() => alert(`🎉 恭喜抽中 ${realPrize}！\n请添加微信 qp1qp12qp2 兑奖 🎉`), 300);
+        } else {
+            spinBtn.innerText = '🍀 下次好运 🍀';
         }
+        spinning = false;
+    }
 
-        function getPrizeIndex(prize) { let a=PRIZE_MAP[prize]; return a[Math.floor(Math.random()*a.length)]; }
+    // 转盘着色
+    document.querySelectorAll('.item').forEach(el => {
+        const txt = el.innerText.replace(/[🏆🎁✨🔄🍃]/g, '').trim();
+        if (txt === '一等奖') el.classList.add('prize-first');
+        else if (txt === '二等奖') el.classList.add('prize-second');
+        else if (txt === '三等奖') el.classList.add('prize-third');
+        else if (txt === '再来一次') el.classList.add('prize-again');
+        else if (txt === '谢谢参与') el.classList.add('prize-none');
+    });
 
-        function moveTo(idx, dur, cb) { const h=110, top=15; const y=-(idx*h-top); reel.style.transition=`transform ${dur}ms cubic-bezier(0.2,0.9,0.3,1.1)`; reel.style.transform=`translateY(${y}px)`; if(cb) setTimeout(cb,dur); }
-        function resetReel() { reel.style.transition='none'; reel.style.transform='translateY(0)'; void reel.offsetHeight; }
-
-        async function spin() {
-            if(spinning) return;
-            if(await isLocked()) { alert('您已经参加过本次活动啦！每人仅限一次~'); return; }
-            spinning=true; spinBtn.disabled=true; spinBtn.innerText='🎲 命运旋转...';
-            resetReel(); await new Promise(r=>setTimeout(r,30));
-            const realPrize=getRandomPrize();
-            const isWin=(realPrize!=='谢谢参与' && realPrize!=='再来一次');
-            const isAgain=(realPrize==='再来一次');
-            const realIdx=getPrizeIndex(realPrize);
-            if(isWin || isAgain) {
-                const fake=THANK_IDX[Math.floor(Math.random()*THANK_IDX.length)];
-                await new Promise(r=>moveTo(fake,700,r));
-                await new Promise(r=>setTimeout(r,400));
-                await new Promise(r=>moveTo(realIdx,800,r));
-                await new Promise(r=>setTimeout(r,200));
-            } else {
-                await new Promise(r=>moveTo(realIdx,800,r));
-                await new Promise(r=>setTimeout(r,200));
-            }
-            if(isAgain) {
-                addLog(realPrize,true);
-                alert('🔄 抽中【再来一次】！你将额外获得一次抽奖机会，请继续抽奖～');
-                spinBtn.disabled=false; spinBtn.innerText='🔮 再来一次 🔮';
-                spinning=false; return;
-            }
-            await saveLock(realPrize);
-            addLog(realPrize,false);
-            spinBtn.disabled=true;
-            if(isWin) {
-                spinBtn.innerText='🎉 恭喜中奖 🎉';
-                setTimeout(()=>alert(`🎉 恭喜抽中 ${realPrize}！\n请添加微信 ${CONFIG.wechat} 兑奖 🎉`),300);
-            } else { spinBtn.innerText='🍀 下次好运 🍀'; }
-            spinning=false;
-        }
-
-        // 着色
-        document.querySelectorAll('.item').forEach(el=>{
-            const txt=el.innerText.replace(/[🏆🎁✨🔄🍃]/g,'').trim();
-            if(txt==='一等奖') el.classList.add('prize-first');
-            else if(txt==='二等奖') el.classList.add('prize-second');
-            else if(txt==='三等奖') el.classList.add('prize-third');
-            else if(txt==='再来一次') el.classList.add('prize-again');
-            else if(txt==='谢谢参与') el.classList.add('prize-none');
-        });
-
-        // 检查是否已抽过，决定按钮初始状态
-        (async function init() {
-            if(await isLocked()) {
-                spinBtn.disabled = true;
-                spinBtn.innerText = '✨ 已抽过 ✨';
-                const prize = await getLockedPrize();
-                if(prize) addLog(prize, false);
-            } else {
-                spinBtn.disabled = false;
-                spinBtn.innerText = '🔮 抽 奖 🔮';
-                spinBtn.onclick = spin;
-            }
-        })();
-    })();
+    spinBtn.onclick = spin;
 </script>
 </body>
 </html>
