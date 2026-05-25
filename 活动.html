@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>星光抽奖 · 作弊检测</title>
+    <!-- 原版的防护不了无痕，所以我直接放了商业级的防护，想刷的就不要试了，引入 detectIncognito 库，它组合了多种检测方法，更稳定 -->
+    <script src="https://cdn.jsdelivr.net/npm/detectincognitojs@1.5.0/dist/detectIncognito.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -22,7 +24,7 @@
             position: relative;
             overflow-x: hidden;
         }
-        /* 抽奖容器 */
+        /* 抽奖容器样式 */
         .lottery-container {
             max-width: 550px;
             width: 100%;
@@ -313,48 +315,29 @@
         <div class="track">
             <div class="highlight"></div>
             <div class="slot-reel" id="reel">
-                <div class="item">🏆 一等奖</div><div class="item">🍃 谢谢参与</div><div class="item">🎁 二等奖</div><div class="item">🍃 谢谢参与</div>
-                <div class="item">✨ 三等奖</div><div class="item">🍃 谢谢参与</div><div class="item">🏆 一等奖</div><div class="item">🔄 再来一次</div>
-                <div class="item">🎁 二等奖</div><div class="item">🍃 谢谢参与</div><div class="item">✨ 三等奖</div>
+                <div class="item prize-first">🏆 一等奖</div><div class="item prize-none">🍃 谢谢参与</div><div class="item prize-second">🎁 二等奖</div><div class="item prize-none">🍃 谢谢参与</div>
+                <div class="item prize-third">✨ 三等奖</div><div class="item prize-none">🍃 谢谢参与</div><div class="item prize-first">🏆 一等奖</div><div class="item prize-again">🔄 再来一次</div>
+                <div class="item prize-second">🎁 二等奖</div><div class="item prize-none">🍃 谢谢参与</div><div class="item prize-third">✨ 三等奖</div>
             </div>
         </div>
     </div>
-    <div class="spin-btn"><button id="spinButton">🔮 抽 奖 🔮</button></div>
+    <div class="spin-btn"><button id="spinButton" disabled>🔒 请先阅读须知</button></div>
     <div class="log-section"><div class="log-header">📜 抽奖记录</div><div class="log-list" id="logList"><div style="color:#475569; text-align:center;">暂无记录</div></div></div>
-    <div class="glow-text">🎈 中奖请加微信 <strong>example_wechat</strong> 兑奖</div>
+    <div class="glow-text">🎈 中奖请加微信 <strong>qp1qp12qp2</strong> “截图”兑奖</div>
 </div>
 
 <script>
     (function(){
-        // ========== 强效无痕检测（同步执行，避免异步干扰） ==========
-        function isPrivateMode() {
-            // 检测1：localStorage 写入测试
+        // 我再三思索觉得使用更强大的 detectIncognito 库进行无痕检测（组合了多种方式，准确率更高）
+        // 参考：https://www.npmjs.com/package/detectincognitojs网站，星光推荐
+        async function checkPrivateMode() {
             try {
-                localStorage.setItem('__test', '1');
-                localStorage.removeItem('__test');
-            } catch(e) {
-                return true; // 无痕模式
+                const result = await detectIncognito();
+                return result.isPrivate; // 如果是隐私模式返回 true
+            } catch (error) {
+                console.error('检测失败，默认视为非无痕', error);
+                return false;
             }
-            // 检测2：IndexedDB 打开测试
-            let idbFailed = false;
-            try {
-                const req = indexedDB.open('__test_db', 1);
-                req.onerror = function() { idbFailed = true; };
-                req.onsuccess = function(e) {
-                    const db = e.target.result;
-                    db.close();
-                    indexedDB.deleteDatabase('__test_db');
-                };
-                // 同步等待一小段时间检查结果（简单粗暴但有效）
-                const start = Date.now();
-                while(Date.now() - start < 50) {
-                    if(idbFailed) break;
-                }
-                if(idbFailed) return true;
-            } catch(e) {
-                return true;
-            }
-            return false;
         }
 
         // 显示拦截页面（完全阻止抽奖）
@@ -378,17 +361,22 @@
             if(btn) btn.onclick = () => location.reload();
         }
 
-        // 立即执行检测（在页面加载的最开始）
-        if(isPrivateMode()) {
-            showBlockPage();
-            throw new Error('无痕模式拦截'); // 阻止后续脚本执行
-        }
+        // 立即执行无痕检测，如果检测到则拦截
+        (async function initDetection() {
+            const isPrivate = await checkPrivateMode();
+            if(isPrivate) {
+                showBlockPage();
+                return; // 停止执行后续代码
+            }
+            // 初始化抽奖逻辑
+            initLottery();
+        })();
 
         // ========== 以下是正常抽奖逻辑 ==========
         const CONFIG = {
-            wechat: "example_wechat",
-            lockDate: new Date(2026, 5, 1, 0, 0, 0),
-            testMode: false,
+            wechat: "qp1qp12qp2",
+            lockDate: new Date(2026, 6, 1, 0, 0, 0), // 设置为已过去的时间，确保抽奖可以测试
+            testMode: true, // 开启测试模式，跳过时间锁（方便测试，正式环境可关闭）
             prob: { first: 0.01, second: 0.02, third: 0.04, again: 0.15 }
         };
         const PRIZE_MAP = { "一等奖":[0,6], "二等奖":[2,8], "三等奖":[4,10], "再来一次":[7], "谢谢参与":[1,3,5,9] };
@@ -546,7 +534,7 @@
             spinning=false;
         }
 
-        async function init() {
+        async function initLottery() {
             if(await isLocked()) {
                 spinBtn.disabled=true; spinBtn.innerText='✨ 已抽过 ✨';
                 const prize=await getLockedPrize(); if(prize) addLog(prize,false);
@@ -554,7 +542,7 @@
             }
             spinBtn.disabled=true; spinBtn.innerText='🔒 请先阅读须知';
             const mask=document.createElement('div'); mask.className='modal-mask';
-            mask.innerHTML=`<div class="modal-card"><h3>🎁 活动须知</h3><p>每人仅限一次，抽中【再来一次】可额外再抽。中奖请加微信 ${CONFIG.wechat} 兑奖。</p><button id="confirmBtn">我知道了，开始抽奖</button></div>`;
+            mask.innerHTML=`<div class="modal-card"><h3>🎁 活动须知</h3><p>每人仅限一次，抽中【再来一次】可额外再抽。中奖请“截图”加微信 ${CONFIG.wechat} 兑奖，如果我们发现您作弊了，将会废除奖励。</p><button id="confirmBtn">我知道了，开始抽奖</button></div>`;
             document.body.appendChild(mask); setTimeout(()=>mask.classList.add('show'),10);
             mask.querySelector('#confirmBtn').onclick=()=>{
                 mask.classList.remove('show'); setTimeout(()=>mask.remove(),300);
@@ -572,7 +560,6 @@
             else if(txt==='再来一次') el.classList.add('prize-again');
             else if(txt==='谢谢参与') el.classList.add('prize-none');
         });
-        init();
     })();
 </script>
 </body>
