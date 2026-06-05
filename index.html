@@ -2,45 +2,39 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>社区主页 · 星光汇影</title>
-    <!--注意，没个代码都是模块化设计删除，不想要的代码包括添加代码的时候，请注意每一个代码的，最后一段-->
-    <!--在不同的代码删除的时候，请务必把注释都删掉，扩展的时候请注意每一个ID（id）-->
-    <!-- 不蒜子统计（已兼容所有设备，话说这玩意真方便好用） -->
-<div style="margin-top: 60px; padding: 12px; background: #f3f4f6; border-radius: 30px; text-align: center; color: #4b5563; font-size: 14px; border: 1px solid #e5e7eb;">
-    <span>📊 本站总访问量：<span id="busuanzi_value_site_pv">0</span>次</span>
-    <span style="margin: 0 8px;">|</span>
-    <span>👥 今日访客：<span id="busuanzi_value_site_uv">0</span>人</span>
-</div>
-
-<!-- 不蒜子脚本（网站检测，该代码可删除单独的设计） -->
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<style>
-    /* 基础重置 */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-<style>
+    <!-- 不蒜子统计 -->
+    <div style="margin-top: 60px; padding: 12px; background: #f3f4f6; border-radius: 30px; text-align: center; color: #4b5563; font-size: 14px; border: 1px solid #e5e7eb;">
+        <span>📊 本站总访问量：<span id="busuanzi_value_site_pv">0</span>次</span>
+        <span style="margin: 0 8px;">|</span>
+        <span>👥 今日访客：<span id="busuanzi_value_site_uv">0</span>人</span>
+    </div>
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <style>
+        /* 基础重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* 浅色主题（默认） */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #1e293b;
             background: linear-gradient(180deg, #ffffff 40%, #0f172a 80%);
-    /* 如果想从白到黑渐变，上方白色，底部黑色 */
-}
             padding-top: 70px;
+            transition: background 0.3s, color 0.3s;
         }
 
         html {
             scroll-behavior: smooth;
         }
 
-        #home, #services, #features, #functions, #contact {
+        /* 所有需要平滑滚动的区域，增加偏移量避免被固定头部遮挡 */
+        #home, #services, #features, #functions, #contact, #virtual-store {
             scroll-margin-top: 70px;
         }
 
@@ -48,10 +42,6 @@
             width: 90%;
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        p:empty, div:empty {
-            display: none;
         }
 
         header {
@@ -63,6 +53,7 @@
             top: 0;
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: background 0.3s;
         }
 
         nav {
@@ -75,6 +66,10 @@
             font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .nav-links {
@@ -97,23 +92,18 @@
             text-underline-offset: 4px;
         }
 
-#hero {
-    background: linear-gradient(rgba(5,5,5,0.0), rgba(0,0,0,0.5)), 
-                url(7801.png) no-repeat center center / cover;
-    height: 90vh;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: white;
-}
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
 
-/* 手机优化 */
-@media (max-width: 800px) {
-    #hero {
-        background-position: center 25%;
-    }
-
-}
+        /* Hero 区域 */
+        #hero {
+            background: linear-gradient(rgba(5,5,5,0.0), rgba(0,0,0,0.5)), url(7801.png) no-repeat center center / cover;
             height: 90vh;
             display: flex;
             align-items: center;
@@ -187,7 +177,6 @@
         .btn-tertiary:hover {
             background: white;
             color: #2563eb;
-            border-color: white;
         }
 
         .section {
@@ -205,13 +194,14 @@
             background-clip: text;
         }
 
-        .cards-grid {
+        .services, .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 2rem;
+            margin-top: 2rem;
         }
 
-        .card {
+        .service, .feature {
             background: white;
             padding: 2rem 1.5rem;
             border-radius: 24px;
@@ -222,76 +212,26 @@
             height: 100%;
         }
 
-        .card:hover {
+        .service:hover, .feature:hover {
             transform: translateY(-8px);
             box-shadow: 0 20px 35px -8px rgba(37,99,235,0.2);
         }
 
-        .card h3 {
+        .service h3, .feature h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
             color: #0f172a;
         }
 
-        .card p {
+        .service p, .feature p {
             color: #475569;
             margin-bottom: 1.5rem;
             flex: 1;
         }
 
-        .card .btn {
+        .service .btn, .feature .btn {
             align-self: flex-start;
             margin-top: auto;
-            background: #2563eb;
-            padding: 0.6rem 1.5rem;
-            font-size: 0.95rem;
-        }
-
-        .card .btn:hover {
-            background: #7c3aed;
-        }
-
-        .feature, .service {
-            background: white;
-            padding: 2rem 1.5rem;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            height: 100%;
-        }
-
-        .feature:hover, .service:hover {
-            transform: translateY(-8px);
-        }
-
-        .feature h3, .service h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #0f172a;
-        }
-
-        .feature p, .service p {
-            color: #475569;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature .btn, .service .btn {
-            margin-top: 0.5rem;
-        }
-
-        .services, .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .services > div, .features > div {
-            height: 100%;
-        }
-
-        .services .services {
-            display: contents;
         }
 
         #contact {
@@ -313,9 +253,119 @@
             text-decoration: underline;
         }
 
+        /* 主题切换按钮 */
+        .theme-switch {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            z-index: 1001;
+            color: white;
+            transition: 0.2s;
+        }
+
+        /* 深色主题样式 */
+        body.dark {
+            color: #f1f5f9;
+            background: linear-gradient(135deg, #0b1120 0%, #1a1f2e 50%, #0f172a 100%);
+            background-attachment: fixed;
+        }
+        body.dark header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        body.dark .logo {
+            background: linear-gradient(135deg, #a5f3fc, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        body.dark .nav-links a {
+            color: #e2e8f0;
+        }
+        body.dark .btn {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+        }
+        body.dark .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+        body.dark .btn-tertiary {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        body.dark .service, body.dark .feature {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        body.dark .service h3, body.dark .feature h3 {
+            color: #f1f5f9;
+        }
+        body.dark .service p, body.dark .feature p {
+            color: #cbd5e1;
+        }
+        body.dark .section-title {
+            background: linear-gradient(135deg, #a5f3fc, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        body.dark #contact {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        body.dark #contact .container p,
+        body.dark #contact .container b,
+        body.dark #contact .container h6 {
+            color: #cbd5e1;
+        }
+        body.dark #contact .container a {
+            color: #a5f3fc;
+        }
+        body.dark .theme-switch {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+
+        /* 商店卡片按钮样式 */
+        .btn-store {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            box-shadow: 0 0 12px rgba(16,185,129,0.5);
+        }
+        body.dark .btn-store {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+        }
+
         @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
             .nav-links {
                 display: none;
+                flex-direction: column;
+                background: #2563eb;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                padding: 1rem 0;
+                text-align: center;
+                gap: 0.8rem;
+            }
+            .nav-links.show {
+                display: flex;
             }
             #hero h1 {
                 font-size: 2.5rem;
@@ -328,579 +378,297 @@
                 width: 100%;
                 max-width: 280px;
             }
+            #hero {
+                background-position: center 25%;
+            }
+            .theme-switch {
+                top: 70px;
+                right: 10px;
+                padding: 4px 12px;
+                font-size: 0.9rem;
+            }
         }
     </style>
-
 </head>
 <body id="home">
-    <header id="v2">
-        <nav id="v3" class="container">
-            <div id="v4" class="logo">✨ 加入我们，一起游玩</div>
+    <button class="theme-switch" id="themeToggle">🌙 深色</button>
+
+    <header>
+        <nav class="container">
+            <div class="logo">✨ 加入我们，一起游玩</div>
+            <button class="menu-toggle" aria-label="菜单">☰</button>
             <ul class="nav-links">
                 <li><a href="#home">首页</a></li>
                 <li><a href="#services">认识我们</a></li>
                 <li><a href="#features">联系</a></li>
                 <li><a href="#functions">更多</a></li>
+                <li><a href="#virtual-store">🛒 虚拟商店</a></li>   <!-- 新增导航链接 -->
                 <li><a href="#contact">关于</a></li>
             </ul>
         </nav>
     </header>
 
     <section id="hero">
-        <div id="v6" class="container hero-content">
-            <h1 id="v7">✨ 社区</h1>
-            <p id="v8">VRC群组 · 虚拟现实爱好者聚集地</p>
+        <div class="container hero-content">
+            <h1>✨ 社区</h1>
+            <p>VRC群组 · 虚拟现实爱好者聚集地</p>
             <div class="hero-buttons">
-                <a id="v9" href="#services" class="btn">📖 快速了解我们</a>
-                <a id="v11" href="#functions" class="btn btn-secondary">🚀 未知某某副业</a>
-                <a id="v13" href="#features" class="btn btn-tertiary">📞 联系我们</a>
-                <a id="v520" href="#114514" class="btn btn-tertiary">🔥 前往抽奖</a>
-               
+                <a href="#services" class="btn">📖 快速了解我们</a>
+                <a href="#functions" class="btn btn-secondary">🚀 未知某某副业</a>
+                <a href="#features" class="btn btn-tertiary">📞 联系我们</a>
+                <a href="#virtual-store" class="btn btn-store">🛒 虚拟商店</a>
             </div>
-            <p id="v10"></p>
-            <p id="v12"></p>
         </div>
     </section>
 
-
-    <section id="114514" class="section">
-        <div id="v15" class="container">
-            <h2 id="v16" class="section-title">🏵 网站活动</h2>
-            <div id="v17" class="services">
-                <div id="v18" class="service">
-                    <h3 id="v19">⚖️ 网页更新投票</h3>
-                    <p id="v20"><a id="v21" href="投票.html" class="btn">前往投票</a></p>
-                </div>
-                <div id="v17" class="services">
-                <div id="v18" class="service">
-                    <h3 id="v19">🔥 抽奖赢模型、折扣、数字产品</h3>
-                    <p id="v20"><a id="v21" href="活动.html" class="btn">我要抽奖！</a></p>
-                </div>
-                
-                
-</section>
-            
+    <!-- 认识我们板块 -->
     <section id="services" class="section">
-        <div id="v15" class="container">
-            <h2 id="v16" class="section-title">🤝 认识我们</h2>
-            <div id="v17" class="services">
-                <div id="v18" class="service">
-                    <h3 id="v19">📱 我们的群聊</h3>
-                    <p id="v20"><a id="v21" href="31.html" class="btn">加入QQ群聊</a></p>
+        <div class="container">
+            <h2 class="section-title">🤝 认识我们</h2>
+            <div class="services">
+                <div class="service">
+                    <h3>📱 我们的群聊</h3>
+                    <p><a href="31.html" class="btn">加入QQ群聊</a></p>
                 </div>
-                <div id="v22" class="service">
-                    <h3 id="v23">👥 我们的团队</h3>
-                    <p id="v24">捞爷星光独自承受这破网站…</p>
+                <div class="service">
+                    <h3>👥 我们的团队</h3>
+                    <p>捞爷星光独自承受这破网站…</p>
                 </div>
-             
+                <div class="service">
+                    <h3>🔮 神秘</h3>
+                    <p><a href="神秘.html" class="btn">let it be</a></p>
                 </div>
-                <div id="v25" class="service">
-                    <h3 id="v26">🔮 神秘</h3>
-                    <p id="v27"><a id="v28" href="神秘.html" class="btn">let it be</a></p>
+                <div class="service">
+                    <h3>💬 为什么要加入Discord群组</h3>
+                    <p>因为QQ人数过多无法维护，如果无法使用了，我们也能使用Discord方便实时通知活动</p>
                 </div>
-                <div id="v29" class="service">
-                    <h3 id="v30">💬 为什么要加入Discord群组</h3>
-                    <p id="v31">因为QQ人数过多无法维护，如果无法使用了，我们也能使用Discord方便实时通知活动</p>
+                <div class="service">
+                    <h3>📥 注册安装Discord</h3>
+                    <p><a href="https://discord.com/" class="btn">官网下载</a></p>
+                    <p><a href="https://github.com/discord" class="btn">Github下载</a></p>
+                    <p><a href="https://discorbs.com" class="btn">国内下载</a></p>
                 </div>
-                <div id="v32" class="services">
-                    <div id="v33" class="service">
-                        <h3 id="v34">📥 注册安装Discord</h3>
-                        <p id="v35"><a id="v36" href="https://discord.com/" class="btn">官网下载</a></p>
-                        <p id="v35"><a id="v36" href="https://github.com/discord" class="btn">Github下载</a></p>
-                        <p id="v35"><a id="v36" href="https://discorbs.com" class="btn">国内下载</a></p>
-                        <div id="v37">
-                            <h3 id="v34">🔗 加入Discord</h3>
-                            <p id="v35"><a id="v36" href="https://discord.gg/UwzmA4zpc" class="btn">加入</a></p>
-                            <div id="v37"></div>
-                        </div>
-                    </div>
+                <div class="service">
+                    <h3>🔗 加入Discord</h3>
+                    <p><a href="https://discord.gg/UwzmA4zpc" class="btn">加入</a></p>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- 虚拟商店卡片（独立板块）增加了 id="virtual-store" -->
+    <section id="virtual-store" class="section">
+        <div class="container">
+            <div class="services">
+                <div class="service" style="text-align: center;">
+                    <h3>🛒 虚拟商店</h3>
+                    <p>在这里你可以购买虚拟模型、专属道具、折扣券等。点击下方按钮前往商店。</p>
+                    <a href="123456.html" class="btn btn-store">前往商店 →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 微笑警告板块 -->;
     <section id="features" class="section">
-    <div id="v39" class="container">
-        <h2 id="v40" class="section-title">⚠️ 微笑是一种警告</h2>
-        <div id="v41" class="features">
-            <div id="v42" class="feature">
-                <h3 id="v43">📺 BV号 · 投稿地</h3>
-                <p id="v44"></p>
-                <p id="v45"><a id="v46" href="https://space.bilibili.com/3706938588138188?spm_id_from=333.1007.0.0" class="btn" target="_blank" rel="noopener">我要投稿！</a></p>
-            </div>
-            <div id="v47" class="feature">
-                <h3 id="v48">📧 邮箱联系</h3>
-                <p id="v49">欢迎反馈模型问题</p>
-                <p id="v50"><a id="v51" href="无项目.html" class="btn">安全问题暂不提供</a></p>
-            </div>
-            <div id="v521" class="feature">
-                <h3 id="v532">📦 VRChat官网</h3>
-                <p id="v543">先去官网注册账号再下载游戏/可以游客游玩(Pc注册，打开加速器就能访问官网)</p>
-                <p id="v554"><a id="v56" href="https://vrchat.com/home" class="btn">前往</a></p>
-            </div>
-            <div id="v52" class="feature">
-                <h3 id="v53">📦 VRChat下载</h3>
-                <p id="v54">PC、安卓（不稳定）、一体机下载源</p>
-                <p id="v55"><a id="v56" href="https://store.steampowered.com/app/438100/VRChat/" class="btn">PC</a></p>
-                <p id="v551"><a id="v56" href="安卓下载源.html" class="btn">安卓</a></p>
-                <p id="v552"><a id="v56" href="https://files.vrcat.icu/" class="btn">一体机</a></p>
-            </div>
-            <div id="v57" class="feature">
-                <h3 id="v58">🤔 为什么没有东西</h3>
-                <p id="v59">因为我tm也不知道放什么…</p>
-            </div>
-</section>
-
-        <div id="v61" class="container">
-            <h2 id="v62" class="section-title">🛠 工具提供</h2>
-            <div id="v63" class="features">
-                <div id="v64" class="feature">
-                    <h3 id="v65">🛠 WARP</h3>
-                    <p id="v67">电脑端很好用的一款改ip软件，体积小，功能强大，在访问官网（VRChat）等等外国网站、unity、VRChat下载、VRChat模型上传、可以使用这款改ip的软件，他名义上不算是梯子，但是拥有很多跟梯子类似的功能，纯免费在国内也可以使用，</p>
-                    <p id="v68"></p>
-                    <a id="v69" href="https://one.one.one.one/" class="btn">下载</a>
+        <div class="container">
+            <h2 class="section-title">⚠️ 微笑是一种警告</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>📺 BV号 · 投稿地</h3>
+                    <p><a href="https://space.bilibili.com/3706938588138188" class="btn" target="_blank">我要投稿！</a></p>
                 </div>
-                <div id="v526" class="feature">
-                <h3 id="v537">📦 unity编辑器</h3>
-                <p id="v548">请选择下载源，目前国内和网盘都没有任何的下载源推荐使用上面那款改Ip软件进入unity就下载，并且不会被定向到中国特供版</p>
-                <p id="v559"><a id="v56" href="https://unity.com/cn/products/unity-personal" class="btn">外国下载</a></p>
-                <p id="v114"><a id="v56" href="无项目.html" class="btn">国内下载</a></p>
-                <p id="v115"><a id="v56" href="无项目.html" class="btn">网盘下载</a></p>
+                <div class="feature">
+                    <h3>📧 邮箱联系</h3>
+                    <p>欢迎反馈模型问题</p>
+                    <p><a href="无项目.html" class="btn">安全问题暂不提供</a></p>
+                </div>
+                <div class="feature">
+                    <h3>📦 VRChat官网</h3>
+                    <p>先去官网注册账号再下载游戏/可以游客游玩</p>
+                    <p><a href="https://vrchat.com/home" class="btn">前往</a></p>
+                </div>
+                <div class="feature">
+                    <h3>📦 VRChat下载</h3>
+                    <p>PC、安卓、一体机下载源</p>
+                    <p><a href="https://store.steampowered.com/app/438100/VRChat/" class="btn">PC</a></p>
+                    <p><a href="安卓下载源.html" class="btn">安卓</a></p>
+                    <p><a href="https://files.vrcat.icu/" class="btn">一体机</a></p>
+                </div>
+                <div class="feature">
+                    <h3>🤔 为什么没有东西</h3>
+                    <p>因为我tm也不知道放什么…</p>
+                </div>
             </div>
-                <div id="v71" class="feature">
-                    <h3 id="v72">🤓 交给你们了</h3>
-                    <p id="v73">还有一些什么好用的工具呢？可以投稿😋</p>
+        </div>
+
+        <div class="container">
+            <h2 class="section-title">🛠 工具提供</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>🛠 WARP</h3>
+                    <p>电脑端改ip软件，免费，访问国外网站/Unity/上传模型很好用。</p>
+                    <a href="https://one.one.one.one/" class="btn">下载</a>
+                </div>
+                <div class="feature">
+                    <h3>📦 unity编辑器</h3>
+                    <p>推荐使用WARP访问国际版下载，避免特供版。</p>
+                    <p><a href="https://unity.com/cn/products/unity-personal" class="btn">外国下载</a></p>
+                    <p><a href="无项目.html" class="btn">国内下载</a></p>
+                    <p><a href="无项目.html" class="btn">网盘下载</a></p>
+                </div>
+                <div class="feature">
+                    <h3>🤓 交给你们了</h3>
+                    <p>还有一些什么好用的工具呢？可以投稿😋</p>
                 </div>
             </div>
         </div>
     </section>
 
-<section id="functions" class="section">
-        <div id="v61" class="container">
-            <h2 id="v62" class="section-title">💰 捐赠</h2>
-            <div id="v63" class="features">
-                <div id="v64" class="feature">
-                    <h3 id="v65">🔍 支持我们</h3>
-                    <a id="v66" href="无项目.html" style="display: none;"></a>
-                    <p id="v67"></p>
-                    <p>我们无偿提供服务，也希望您自愿捐赠。你可以自主选择金额，但我们更希望你使用这些钱去买一些自己喜欢的零食与物品我们理解任何人，金钱来源不容易</p>
-                    <p id="v68"></p>
-                    <a id="v69" href="支持.html" class="btn">捐赠</a>
-                    <p id="v70"></p>
+    <!-- 捐赠板块 -->
+    <section id="functions" class="section">
+        <div class="container">
+            <h2 class="section-title">💰 捐赠</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>🔍 支持我们</h3>
+                    <p>我们无偿提供服务，自愿捐赠。更希望你用这些钱去买零食或自己喜欢的东西。</p>
+                    <a href="支持.html" class="btn">捐赠</a>
                 </div>
-                <div id="v71" class="feature">
-                    <h3 id="v72">💤 无数据的话请等待探索</h3>
-                    <p id="v73">我要思考先一会，算了我困了睡觉去了</p>
+                <div class="feature">
+                    <h3>💤 无数据的话请等待探索</h3>
+                    <p>我要思考先一会，算了我困了睡觉去了</p>
                 </div>
             </div>
         </div>
     </section>
 
-<
+    <!-- 关于区域 -->
     <section id="contact" class="section">
-        <div id="v75" class="container">
-            <div id="v76" class="container">
-                <h1 id="v77">该网站代码免费公开使用<br>
-                Github搜索<big>“XG108”</big></h1>
-                <b id="v78">允许复制使用，仅需更改内容即可为你的群组建立网站（禁止商业化！）</b>
-            </div>    
-                <b id="v79">该网站无任何安全措施，如果无法访问请稍等，也请不要过度访问</b>
-                <p id="v80">网站由“星光汇影”维护，部分链接由“星光汇影”提供失效请反馈，有问题直接达斯🥰即可</p>
-                
-                <h6 id="v81">网站版本1.0测试版</h6>
-                <a href="维护.html">维护日志</a>
-
-            </div>
+        <div class="container">
+            <h1>该网站代码免费公开使用<br>Github搜索 <big>“XG108”</big></h1>
+            <b>允许复制使用，仅需更改内容即可为你的群组建立网站（禁止商业化！）</b>
+            <b>该网站无任何安全措施，如果无法访问请稍等，也请不要过度访问</b>
+            <p>网站由“星光汇影”维护，部分链接失效请反馈，有问题直接达斯🥰即可</p>
+            <h6>网站版本1.0测试版</h6>
+            <a href="维护.html">维护日志</a>
         </div>
     </section>
-    
+
+    <!-- 彩蛋脚本（保留原有效果） -->
     <script>
-// 开发者控制台彩蛋嘻嘻，不喜欢的可以去掉(*≧▽≦)
-console.log('%c🎮 欢迎来到隐藏世界！', 'font-size:16px; color: #2563eb; font-weight:bold');
-console.log('%c🔍 想找彩蛋？试试 ↑↑↓↓←→←→BA', 'font-size:14px; color: #7c3aed');
-console.log('%c💬 或者连续点击左上角Logo？', 'font-size:14px; color: #10b981');
-console.log('%c📱 QQ群: 1064117555', 'font-size:14px; background: #2563eb; color: white; padding: 2px 6px; border-radius: 4px;');
-</script>
-<!--==========以下是彩蛋代码，可选择保留，不想要的话，就把下面的东西都给删掉就行每个都是单独的，想要什么功能保留就行========>
-<!-- ========== 高级点击彩蛋 ========== -->
-<style>
-/* 纸屑样式 */
-.confetti {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    background: #f00;
-    border-radius: 50%;
-    z-index: 9999;
-    pointer-events: none;
-    top: -10px;
-    animation: fall linear forwards;
-}
-
-@keyframes fall {
-    to {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
-    }
-}
-
-/* 提示浮层样式 */
-.egg-toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #2563eb;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-weight: 600;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    white-space: nowrap;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.egg-toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-.egg-toast i {
-    font-size: 20px;
-}
-</style>
-
-<script>
-(function() {
-    // ---- 配置 ----
-    const LOGO_SELECTOR = '.logo';           // 点击目标
-    const GROUP_NUMBER = '1064117555';        // 群号
-    const CLICKS_NEEDED = 5;                   // 所需点击次数
-    const RESET_TIMEOUT = 3000;                 // 重置间隔（毫秒）
-
-    const logo = document.querySelector(LOGO_SELECTOR);
-    if (!logo) return;
-
-    let clickCount = 0;
-    let resetTimer = null;
-
-    // ---- 工具函数：复制文本（兼容旧浏览器） ----
-    function copyToClipboard(text) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).catch(() => {
-                fallbackCopy(text);
-            });
-        } else {
-            fallbackCopy(text);
-        }
-    }
-
-    function fallbackCopy(text) {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            document.execCommand('copy');
-        } catch (err) {
-            console.warn('复制失败，请手动复制');
-        }
-        document.body.removeChild(textarea);
-    }
-
-    // ---- 工具函数：生成随机颜色 ----
-    function randomColor() {
-        const colors = ['#2563eb', '#7c3aed', '#f59e0b', '#10b981', '#ef4444', '#ec4899'];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    // ---- 纸屑飘落 ----
-    function createConfetti(count = 40) {
-        for (let i = 0; i < count; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + '%';
-            confetti.style.background = randomColor();
-            confetti.style.width = Math.random() * 8 + 6 + 'px';
-            confetti.style.height = confetti.style.width;
-            confetti.style.animationDuration = Math.random() * 2 + 1.5 + 's'; // 1.5~3.5秒
-            confetti.style.animationDelay = Math.random() * 0.5 + 's';
-            document.body.appendChild(confetti);
-
-            // 动画结束后移除
-            setTimeout(() => {
-                confetti.remove();
-            }, 4000);
-        }
-    }
-
-    // ---- 显示提示浮层 ----
-    function showToast(message, icon = '🎉') {
-        // 移除已存在的toast
-        const oldToast = document.querySelector('.egg-toast');
-        if (oldToast) oldToast.remove();
-
-        const toast = document.createElement('div');
-        toast.className = 'egg-toast';
-        toast.innerHTML = `<span>${icon}</span> ${message}`;
-        document.body.appendChild(toast);
-
-        // 强制重绘后添加show类
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 10);
-
-        // 2.5秒后消失
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 2500);
-    }
-
-    // ---- Logo 抖动效果 ----
-    function shakeLogo() {
-        logo.style.transition = 'transform 0.1s';
-        logo.style.transform = 'rotate(2deg) scale(1.1)';
-        setTimeout(() => {
-            logo.style.transform = 'rotate(-2deg) scale(1.1)';
-        }, 100);
-        setTimeout(() => {
-            logo.style.transform = 'rotate(0) scale(1)';
-        }, 200);
-        setTimeout(() => {
-            logo.style.transition = ''; // 恢复默认
-        }, 300);
-    }
-
-    // ---- 触发彩蛋 ----
-    function activateEasterEgg() {
-        // 1. 复制群号
-        copyToClipboard(GROUP_NUMBER);
-
-        // 2. 飘纸屑
-        createConfetti(50);
-
-        // 3. 显示提示
-        showToast('🎉 发现彩蛋！群号已复制', '🎊');
-
-        // 4. Logo 抖动
-        shakeLogo();
-
-        // 5. 控制台彩蛋（可选）
-        console.log('%c✨ 彩蛋触发！欢迎加入QQ群 ' + GROUP_NUMBER, 'background:#2563eb;color:white;padding:2px 6px;border-radius:4px;');
-    }
-
-    // ---- 点击监听 ----
-    logo.addEventListener('click', function() {
-        clickCount++;
-
-        // 清除之前的重置计时器
-        if (resetTimer) clearTimeout(resetTimer);
-
-        // 达到目标点击次数
-        if (clickCount >= CLICKS_NEEDED) {
-            activateEasterEgg();
-            clickCount = 0; // 重置计数
-        } else {
-            // 设定超时重置
-            resetTimer = setTimeout(() => {
-                clickCount = 0;
-                resetTimer = null;
-            }, RESET_TIMEOUT);
-        }
-    });
-
-    // 移动端触摸事件兼容（防止双击缩放干扰，但不影响click）
-    logo.addEventListener('touchstart', (e) => {
-        // 什么也不做，让click继续触发
-    }, { passive: true });
-
-})();
-</script>
-<!-- ========== 彩蛋时间结束喽～～(*￣rǒ￣) ========== -->
-<!-- 彩蛋猫滚动到底部弹猫咪 -->
-<style>
-.egg-message {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #2563eb;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 40px;
-    font-weight: 500;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    max-width: 90vw;
-    text-align: center;
-    font-size: 16px;
-    white-space: normal;
-    word-break: break-word;
-}
-.egg-message.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-</style>
-
-<script>
-(function() {
-    // 纸屑函数（如果之前没有定义，这里补一个简化版）
-    if (typeof window.createConfetti !== 'function') {
-        window.createConfetti = function(count = 30) {
-            for (let i = 0; i < count; i++) {
-                const conf = document.createElement('div');
-                conf.style.cssText = `
-                    position: fixed;
-                    left: ${Math.random() * 100}%;
-                    top: -10px;
-                    width: ${Math.random() * 8 + 4}px;
-                    height: ${Math.random() * 8 + 4}px;
-                    background: hsl(${Math.random() * 360}, 70%, 60%);
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 9999;
-                    animation: fall ${Math.random() * 2 + 1.5}s linear forwards;
-                `;
-                document.body.appendChild(conf);
-                setTimeout(() => conf.remove(), 3000);
+        (function() {
+            const toggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            if (toggle && navLinks) {
+                toggle.addEventListener('click', () => navLinks.classList.toggle('show'));
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => navLinks.classList.remove('show'));
+                });
             }
-        };
-        // 添加纸屑动画样式
-        if (!document.querySelector('#confetti-style')) {
-            const style = document.createElement('style');
-            style.id = 'confetti-style';
-            style.textContent = `
-                @keyframes fall {
-                    to {
-                        transform: translateY(100vh) rotate(720deg);
-                        opacity: 0;
-                    }
+        })();
+
+        console.log('%c🎮 欢迎来到隐藏世界！', 'font-size:16px; color: #2563eb; font-weight:bold');
+        console.log('%c📱 QQ群: 1064117555', 'background:#2563eb; color:white; padding:2px 6px; border-radius:4px;');
+
+        // 点击Logo彩蛋（5次复制群号）
+        (function() {
+            const logo = document.querySelector('.logo');
+            if (!logo) return;
+            let count = 0, timer = null;
+            const GROUP = '1064117555';
+            function copy(text) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+            function showMsg(msg) {
+                let div = document.createElement('div');
+                div.innerText = msg;
+                div.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#2563eb; color:white; padding:8px 20px; border-radius:40px; z-index:9999;';
+                document.body.appendChild(div);
+                setTimeout(() => div.remove(), 2000);
+            }
+            logo.addEventListener('click', () => {
+                count++;
+                if (timer) clearTimeout(timer);
+                if (count >= 5) {
+                    copy(GROUP);
+                    showMsg('🎉 群号已复制！');
+                    count = 0;
+                } else {
+                    timer = setTimeout(() => count = 0, 3000);
                 }
-            `;
-            document.head.appendChild(style);
-        }
-    }
+            });
+        })();
 
-    let bottomReached = false;
-    const message = '哦吼吼吼吼…到底了……';
+        // 滚动底部彩蛋
+        (function() {
+            let bottomFlag = false;
+            window.addEventListener('scroll', () => {
+                if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 100 && !bottomFlag) {
+                    bottomFlag = true;
+                    let msg = document.createElement('div');
+                    msg.innerText = '哦吼吼吼吼…到底了……';
+                    msg.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#7c3aed; color:white; padding:8px 20px; border-radius:40px; z-index:9999;';
+                    document.body.appendChild(msg);
+                    setTimeout(() => msg.remove(), 2500);
+                    setTimeout(() => bottomFlag = false, 10000);
+                }
+            });
+        })();
 
-    function showMessage() {
-        // 移除旧的浮层
-        const old = document.querySelector('.egg-message');
-        if (old) old.remove();
-
-        const div = document.createElement('div');
-        div.className = 'egg-message';
-        div.textContent = message;
-        document.body.appendChild(div);
-
-        setTimeout(() => div.classList.add('show'), 10);
-        setTimeout(() => {
-            div.classList.remove('show');
-            setTimeout(() => div.remove(), 300);
-        }, 3000);
-
-        // 撒点纸屑
-        if (window.createConfetti) createConfetti(20);
-    }
-
-    window.addEventListener('scroll', function() {
-        const scrollY = window.scrollY || window.pageYOffset;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-
-        if (scrollY + windowHeight >= documentHeight - 100) {
-            if (!bottomReached) {
-                bottomReached = true;
-                showMessage();
-                // 10秒后才能再次触发
-                setTimeout(() => { bottomReached = false; }, 10000);
+        // 纸屑和随机名言彩蛋（简单版，可保留）
+        (function() {
+            if (typeof window.createConfetti !== 'function') {
+                window.createConfetti = function(count = 30) {
+                    for (let i = 0; i < count; i++) {
+                        const conf = document.createElement('div');
+                        conf.style.cssText = `
+                            position: fixed;
+                            left: ${Math.random() * 100}%;
+                            top: -10px;
+                            width: ${Math.random() * 8 + 4}px;
+                            height: ${Math.random() * 8 + 4}px;
+                            background: hsl(${Math.random() * 360}, 70%, 60%);
+                            border-radius: 50%;
+                            pointer-events: none;
+                            z-index: 9999;
+                            animation: fall ${Math.random() * 2 + 1.5}s linear forwards;
+                        `;
+                        document.body.appendChild(conf);
+                        setTimeout(() => conf.remove(), 3000);
+                    }
+                };
+                if (!document.querySelector('#confetti-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'confetti-style';
+                    style.textContent = `@keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }`;
+                    document.head.appendChild(style);
+                }
             }
-        }
-    });
-})();
-</script>
-<!-- 彩蛋随机掉落名言 -->
-<style>
-.floating-message {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #7c3aed;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 30px;
-    font-weight: 500;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    z-index: 9999;
-    opacity: 0;
-    transform: translateX(30px);
-    transition: opacity 0.4s, transform 0.4s;
-    max-width: 80vw;
-    text-align: center;
-    font-size: 15px;
-    white-space: normal;
-    word-break: break-word;
-    pointer-events: none;
-}
-.floating-message.show {
-    opacity: 1;
-    transform: translateX(0);
-}
-</style>
+        })();
 
-<script>
-(function() {
-    const messages = [
-        "🛠️ 程序猿也是入，也会困",
-        "☕ 这破网站居然有彩蛋",
-        "🐧 姑姑嘎嘎！",
-        "🎮 你知道吗ERP是企业物品管理器",
-        "👀 有人看到我了吗？",
-        "✨ 星光是傻福但傻又没福",
-        "🤕 你知道吗网页又炸了",
-        "🎉 发现隐藏彩蛋了吗？",
-        "💡 部分彩蛋只会存在一定时间内就会删除",
-        "😋 PC和手机也能玩彩蛋"
-    ];
-
-    let interval = setInterval(() => {
-        // 随机选一句
-        const text = messages[Math.floor(Math.random() * messages.length)];
-
-        // 移除旧的浮层
-        const old = document.querySelector('.floating-message');
-        if (old) old.remove();
-
-        const div = document.createElement('div');
-        div.className = 'floating-message';
-        div.textContent = text;
-        document.body.appendChild(div);
-
-        // 显示
-        setTimeout(() => div.classList.add('show'), 10);
-
-        // 3秒后隐藏并移除
-        setTimeout(() => {
-            div.classList.remove('show');
-            setTimeout(() => div.remove(), 400);
-        }, 10000);
-    }, 10000); // 15秒一次
-})();
-</script>
-
+        // 主题切换逻辑
+        (function() {
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark');
+                    themeToggle.innerHTML = '☀️ 浅色';
+                }
+                themeToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark');
+                    const isDark = body.classList.contains('dark');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    themeToggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
-
-       
