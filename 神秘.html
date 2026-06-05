@@ -130,7 +130,7 @@
             cursor: pointer;
         }
         
-        /* 留言区 */
+        /* 留言区（后端版） */
         .message-form {
             display: flex;
             gap: 10px;
@@ -159,27 +159,41 @@
             cursor: pointer;
             font-weight: bold;
         }
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .message-wall {
             background: #0f172a;
             border-radius: 20px;
             padding: 15px;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
         }
         .message-item {
             padding: 8px 12px;
             border-bottom: 1px solid #334155;
             color: #cbd5e1;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             word-break: break-word;
         }
         .message-item:last-child {
             border-bottom: none;
         }
+        .message-time {
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-left: 8px;
+        }
         .empty-message {
             color: #64748b;
             text-align: center;
             padding: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
         }
         
         /* 返回链接 */
@@ -216,15 +230,15 @@
             </div>
         </div>
         
-        <!-- 3. 留言区 -->
+        <!-- 3. 留言区（后端） -->
         <div class="card">
-            <div class="card-title">💬 匿名留言墙</div>
+            <div class="card-title">💬 匿名留言墙 · 全站可见</div>
             <div class="message-form">
-                <input type="text" class="message-input" id="messageInput" placeholder="留下点什么..." maxlength="50">
+                <input type="text" class="message-input" id="messageInput" placeholder="留下点什么（最多50字）..." maxlength="50">
                 <button class="send-btn" id="sendMsgBtn">发送</button>
             </div>
             <div class="message-wall" id="messageWall">
-                <div class="empty-message">还没有留言，来当第一个吧～</div>
+                <div class="loading">加载留言中...</div>
             </div>
         </div>
         
@@ -232,7 +246,10 @@
     </div>
 
     <script>
-        // ==================== 抽签系统 ====================
+        // ========== 后端配置（请替换为你的 Google Apps Script URL） ==========
+        const BACKEND_URL = 'YOUR_APPS_SCRIPT_URL';  // 这里填入你部署的留言后端地址
+        
+        // ========== 抽签系统（不变） ==========
         const fortunes = [
             "✨ 大吉 ✨ 今天适合加群", 
             "🍀 小吉 🍀 会遇到好事", 
@@ -250,7 +267,7 @@
             document.getElementById('fortuneResult').textContent = fortunes[random];
         });
         
-        // ==================== 瞎搞的迷宫游戏 ====================
+        // ========== 迷宫游戏（不变） ==========
         const gameStates = {
             start: {
                 desc: '你站在一扇古老的大门前，门上刻着神秘的符号。',
@@ -300,10 +317,8 @@
         function updateGame() {
             const scene = gameStates[currentScene];
             document.getElementById('sceneDesc').textContent = scene.desc;
-            
             const choicesDiv = document.getElementById('choices');
             choicesDiv.innerHTML = '';
-            
             scene.choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
@@ -320,60 +335,88 @@
             currentScene = 'start';
             updateGame();
         });
-        
         updateGame();
         
-        // ==================== 留言系统 ===================
-        const STORAGE_KEY = 'mysteryMessages';
+        // ========== 留言墙（后端） ==========
+        const messageWall = document.getElementById('messageWall');
+        const sendBtn = document.getElementById('sendMsgBtn');
+        const messageInput = document.getElementById('messageInput');
         
-        function loadMessages() {
-            const messages = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            const wall = document.getElementById('messageWall');
-            
-            if (messages.length === 0) {
-                wall.innerHTML = '<div class="empty-message">还没有留言，来当第一个吧～</div>';
-                return;
+        // 加载留言
+        async function loadMessages() {
+            try {
+                const response = await fetch(BACKEND_URL);
+                const data = await response.json();
+                if (data.messages && data.messages.length > 0) {
+                    // 按时间倒序显示（最新在上）
+                    const reversed = [...data.messages].reverse();
+                    messageWall.innerHTML = reversed.map(msg => `
+                        <div class="message-item">
+                            💬 ${escapeHtml(msg.content)}
+                            <span class="message-time">${msg.time}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    messageWall.innerHTML = '<div class="empty-message">还没有留言，来当第一个吧～</div>';
+                }
+                // 滚动到底部
+                messageWall.scrollTop = messageWall.scrollHeight;
+            } catch (err) {
+                console.error('加载留言失败', err);
+                messageWall.innerHTML = '<div class="empty-message">⚠️ 留言加载失败，请稍后刷新</div>';
             }
-            
-            wall.innerHTML = messages.map(msg => 
-                `<div class="message-item">💬 ${msg}</div>`
-            ).join('');
-            
-            // 自动滚动到底部
-            wall.scrollTop = wall.scrollHeight;
         }
         
-        function addMessage(text) {
-            if (!text.trim()) return;
-            
-            const messages = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            messages.push(text.trim());
-            // 只保留最近50条
-            if (messages.length > 50) messages.shift();
-            
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-            loadMessages();
+        // 发送留言
+        async function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content) return;
+            sendBtn.disabled = true;
+            sendBtn.textContent = '发送中...';
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify({ message: content })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    messageInput.value = '';
+                    await loadMessages(); // 重新加载
+                } else {
+                    alert('发送失败，请稍后重试');
+                }
+            } catch (err) {
+                console.error('发送留言失败', err);
+                alert('网络错误，请检查后重试');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+            }
         }
         
-        document.getElementById('sendMsgBtn').addEventListener('click', () => {
-            const input = document.getElementById('messageInput');
-            addMessage(input.value);
-            input.value = '';
+        // 简单的 XSS 防护
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // 绑定事件
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
         
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('sendMsgBtn').click();
-            }
-        });
-        
-        // 加载历史留言
+        // 初始化加载留言
         loadMessages();
         
-        // 添加几个示例留言（可选，第一次使用时显示）
-        if (!localStorage.getItem(STORAGE_KEY)) {
-            addMessage('我发现了神秘空间！');
-            addMessage('抽到了大吉 ✨');
+        // 如果后端 URL 未配置，提示用户
+        if (BACKEND_URL === 'https://script.google.com/macros/s/AKfycbxJO2Ne9hSDPjhoItq1m4xmr1pUVkvff6_zOpIJGJXMHUeGeDdfvu0mEzmw9P1VlGtFYQ/exec') {
+            messageWall.innerHTML = '<div class="empty-message">⚠️ 请先配置后端 URL（在代码中修改 BACKEND_URL）</div>';
         }
     </script>
 </body>
