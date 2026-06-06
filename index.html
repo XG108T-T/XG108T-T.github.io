@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>社区主页 · 星光汇影</title>
-    <!-- 不蒜子统计 -->
-    <div style="margin-top: 60px; padding: 12px; background: #f3f4f6; border-radius: 30px; text-align: center; color: #4b5563; font-size: 14px; border: 1px solid #e5e7eb;">
-        <span>📊 本站总访问量：<span id="busuanzi_value_site_pv">0</span>次</span>
-        <span style="margin: 0 8px;">|</span>
-        <span>👥 今日访客：<span id="busuanzi_value_site_uv">0</span>人</span>
-    </div>
+<!-- Vercount 统计（国内节点，兼顾国内外） -->
+<script defer src="https://cn.vercount.one/js"></script>
+
+<!-- 统计显示区域（不变） -->
+<div style="margin-top: 60px; padding: 12px; background: #f3f4f6; border-radius: 30px; text-align: center; color: #4b5563; font-size: 14px; border: 1px solid #e5e7eb;">
+    <span>📊 本站总访问量：<span id="busuanzi_value_site_pv">0</span>次</span>
+    <span style="margin: 0 8px;">|</span>
+    <span>👥 今日访客：<span id="busuanzi_value_site_uv">0</span>人</span>
+</div>
     <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     <style>
         /* 基础重置 */
@@ -399,11 +402,11 @@
             <button class="menu-toggle" aria-label="菜单">☰</button>
             <ul class="nav-links">
                 <li><a href="#home">首页</a></li>
-                <li><a href="#services">认识我们</a></li>
-                <li><a href="#features">联系</a></li>
-                <li><a href="#functions">更多</a></li>
+                <li><a href="#services">🤝 认识我们</a></li>
+                <li><a href="#features">📮 联系</a></li>
+                <li><a href="#functions">⚙️ 更多</a></li>
                 <li><a href="#virtual-store">🛒 虚拟商店</a></li>   <!-- 新增导航链接 -->
-                <li><a href="#contact">关于</a></li>
+                <li><a href="#contact">🗿 关于</a></li>
             </ul>
         </nav>
     </header>
@@ -468,8 +471,21 @@
             </div>
         </div>
     </section>
+    
+    <!-- 聊天板块（测试板块）增加了 id="virtual-store" -->
+    <section id="virtual-store" class="section">
+        <div class="container">
+            <div class="services">
+                <div class="service" style="text-align: center;">
+                    <h3>☁ 聊天室（测试）</h3>
+                    <p>星光临时搭建的聊天频道，测试使用Firebase的稳定性</p>
+                    <a href="LT.html" class="btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 0 12px rgba(139,92,246,0.5);">前往聊天 →</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- 微笑警告板块 -->;
+    <!-- 微笑警告板块 -->
     <section id="features" class="section">
         <div class="container">
             <h2 class="section-title">⚠️ 微笑是一种警告</h2>
@@ -651,7 +667,7 @@
                 }
             }
         })();
-
+        
         // 主题切换逻辑
         (function() {
             const themeToggle = document.getElementById('themeToggle');
@@ -670,5 +686,69 @@
             }
         })();
     </script>
+    <!-- 右下角随机名言彩蛋 -->
+<style>
+.floating-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #7c3aed;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.4s, transform 0.4s;
+    max-width: 80vw;
+    text-align: center;
+    font-size: 15px;
+    white-space: normal;
+    word-break: break-word;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+}
+.floating-message.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+</style>
+
+<script>
+(function() {
+    const messages = [
+        "🛠️ 程序猿也是人，也会困",
+        "☕ 这破网站居然有彩蛋",
+        "🐧 姑姑嘎嘎！",
+        "🎮 你知道吗？ERP是企业物品管理器",
+        "👀 有人看到我了吗？",
+        "✨ 星光是傻福但傻又没福",
+        "🤕 你知道吗网页又炸了",
+        "🎉 发现隐藏彩蛋了吗？",
+        "💡 部分彩蛋只会存在一定时间内就会删除",
+        "😋 PC和手机也能玩彩蛋",
+        "🐶 汪！豆狗表示很赞",
+        "🦊 星月灵狐偷偷路过",
+        "🐱 莫本猫猫拍了拍你"
+    ];
+
+    let interval = setInterval(() => {
+        const text = messages[Math.floor(Math.random() * messages.length)];
+        const old = document.querySelector('.floating-message');
+        if (old) old.remove();
+        const div = document.createElement('div');
+        div.className = 'floating-message';
+        div.textContent = text;
+        document.body.appendChild(div);
+        setTimeout(() => div.classList.add('show'), 10);
+        setTimeout(() => {
+            div.classList.remove('show');
+            setTimeout(() => div.remove(), 400);
+        }, 8000);
+    }, 12000);
+})();
+</script>
 </body>
 </html>

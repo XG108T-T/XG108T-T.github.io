@@ -54,8 +54,6 @@
             border-bottom: 1px solid #334155;
             padding-bottom: 10px;
         }
-        
-        /* 抽签区 */
         .fortune-box {
             text-align: center;
             padding: 20px;
@@ -87,8 +85,6 @@
             border-radius: 50px;
             padding: 15px;
         }
-        
-        /* 迷宫区 */
         .game-area {
             text-align: center;
         }
@@ -129,8 +125,6 @@
             border-radius: 30px;
             cursor: pointer;
         }
-        
-        /* 留言区（后端版） */
         .message-form {
             display: flex;
             gap: 10px;
@@ -195,8 +189,6 @@
             padding: 20px;
             color: #94a3b8;
         }
-        
-        /* 返回链接 */
         .back-link {
             display: block;
             text-align: center;
@@ -211,7 +203,6 @@
         <h1>✨ 神秘空间 ✨</h1>
         <p class="subtitle">自制三个彩蛋，一次满足探索佬</p>
         
-        <!-- 1. 抽签区 -->
         <div class="card">
             <div class="card-title">🎲 今日运势抽签</div>
             <div class="fortune-box">
@@ -220,7 +211,6 @@
             </div>
         </div>
         
-        <!-- 2. 迷宫区 -->
         <div class="card">
             <div class="card-title">🏰 神秘迷宫</div>
             <div class="game-area">
@@ -230,7 +220,6 @@
             </div>
         </div>
         
-        <!-- 3. 留言区（后端） -->
         <div class="card">
             <div class="card-title">💬 匿名留言墙 · 全站可见</div>
             <div class="message-form">
@@ -246,28 +235,22 @@
     </div>
 
     <script>
-        // ========== 后端配置（请替换为你的 Google Apps Script URL） ==========
-        const BACKEND_URL = 'YOUR_APPS_SCRIPT_URL';  // 这里填入你部署的留言后端地址
+        // ========== 1. 配置后端地址 ==========
+        // ⚠️ 请把下面的 URL 替换成你自己的 Google Apps Script 地址
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxJO2Ne9hSDPjhoItq1m4xmr1pUVkvff6_zOpIJGJXMHUeGeDdfvu0mEzmw9P1VlGtFYQ/exec';
         
-        // ========== 抽签系统（不变） ==========
+        // ========== 2. 抽签系统 ==========
         const fortunes = [
-            "✨ 大吉 ✨ 今天适合加群", 
-            "🍀 小吉 🍀 会遇到好事", 
-            "🌙 末吉 🌙 平淡是福", 
-            "⚡ 凶 ⚡ 小心手机没电",
-            "🌟 吉 🌟 有人正在想你",
-            "💫 中吉 💫 适合尝试新事物",
-            "🎉 大吉 🎉 今晚有彩蛋",
-            "😴 末吉 😴 早点休息",
-            "🔥 小吉 🔥 运气正在上升"
+            "✨ 大吉 ✨ 今天适合加群", "🍀 小吉 🍀 会遇到好事", "🌙 末吉 🌙 平淡是福",
+            "⚡ 凶 ⚡ 小心手机没电", "🌟 吉 🌟 有人正在想你", "💫 中吉 💫 适合尝试新事物",
+            "🎉 大吉 🎉 今晚有彩蛋", "😴 末吉 😴 早点休息", "🔥 小吉 🔥 运气正在上升"
         ];
-        
         document.getElementById('fortuneBtn').addEventListener('click', function() {
             const random = Math.floor(Math.random() * fortunes.length);
             document.getElementById('fortuneResult').textContent = fortunes[random];
         });
         
-        // ========== 迷宫游戏（不变） ==========
+        // ========== 3. 迷宫游戏 ==========
         const gameStates = {
             start: {
                 desc: '你站在一扇古老的大门前，门上刻着神秘的符号。',
@@ -293,27 +276,18 @@
             },
             treasure: {
                 desc: '宝箱里有一张纸条："恭喜你！彩蛋代码：🎉 17580"',
-                choices: [
-                    { text: '🎁 再玩一次', next: 'start' }
-                ]
+                choices: [ { text: '🎁 再玩一次', next: 'start' } ]
             },
             monster: {
                 desc: '银色宝箱里跳出一个小丑，把你吓了一跳！',
-                choices: [
-                    { text: '🏃 快跑', next: 'start' },
-                    { text: '😱 尖叫', next: 'start' }
-                ]
+                choices: [ { text: '🏃 快跑', next: 'start' }, { text: '😱 尖叫', next: 'start' } ]
             },
             dark: {
                 desc: '你走进黑暗通道，看到墙上写着："此路不通"',
-                choices: [
-                    { text: '🔙 返回大厅', next: 'hall' }
-                ]
+                choices: [ { text: '🔙 返回大厅', next: 'hall' } ]
             }
         };
-        
         let currentScene = 'start';
-        
         function updateGame() {
             const scene = gameStates[currentScene];
             document.getElementById('sceneDesc').textContent = scene.desc;
@@ -323,21 +297,17 @@
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.textContent = choice.text;
-                btn.onclick = () => {
-                    currentScene = choice.next;
-                    updateGame();
-                };
+                btn.onclick = () => { currentScene = choice.next; updateGame(); };
                 choicesDiv.appendChild(btn);
             });
         }
-        
         document.getElementById('resetGame').addEventListener('click', () => {
             currentScene = 'start';
             updateGame();
         });
         updateGame();
         
-        // ========== 留言墙（后端） ==========
+        // ========== 4. 留言墙（后端） ==========
         const messageWall = document.getElementById('messageWall');
         const sendBtn = document.getElementById('sendMsgBtn');
         const messageInput = document.getElementById('messageInput');
@@ -348,7 +318,6 @@
                 const response = await fetch(BACKEND_URL);
                 const data = await response.json();
                 if (data.messages && data.messages.length > 0) {
-                    // 按时间倒序显示（最新在上）
                     const reversed = [...data.messages].reverse();
                     messageWall.innerHTML = reversed.map(msg => `
                         <div class="message-item">
@@ -359,11 +328,10 @@
                 } else {
                     messageWall.innerHTML = '<div class="empty-message">还没有留言，来当第一个吧～</div>';
                 }
-                // 滚动到底部
                 messageWall.scrollTop = messageWall.scrollHeight;
             } catch (err) {
                 console.error('加载留言失败', err);
-                messageWall.innerHTML = '<div class="empty-message">⚠️ 留言加载失败，请稍后刷新</div>';
+                messageWall.innerHTML = '<div class="empty-message">⚠️ 留言加载失败，请检查后端URL或网络</div>';
             }
         }
         
@@ -382,7 +350,7 @@
                 const result = await response.json();
                 if (result.success) {
                     messageInput.value = '';
-                    await loadMessages(); // 重新加载
+                    await loadMessages();
                 } else {
                     alert('发送失败，请稍后重试');
                 }
@@ -395,7 +363,6 @@
             }
         }
         
-        // 简单的 XSS 防护
         function escapeHtml(str) {
             return str.replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
@@ -405,19 +372,13 @@
             });
         }
         
-        // 绑定事件
         sendBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
         
-        // 初始化加载留言
+        // 初始化加载
         loadMessages();
-        
-        // 如果后端 URL 未配置，提示用户
-        if (BACKEND_URL === 'https://script.google.com/macros/s/AKfycbxJO2Ne9hSDPjhoItq1m4xmr1pUVkvff6_zOpIJGJXMHUeGeDdfvu0mEzmw9P1VlGtFYQ/exec') {
-            messageWall.innerHTML = '<div class="empty-message">⚠️ 请先配置后端 URL（在代码中修改 BACKEND_URL）</div>';
-        }
     </script>
 </body>
 </html>

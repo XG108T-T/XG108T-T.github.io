@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>星光聊天室 · 为测试版本</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #faf9f8;
+            color: #1a1a1a;
+            transition: background 0.3s, color 0.3s;
+            height: 100vh;
+            overflow: hidden;
+        }
+        body.dark {
+            background: #0a0c10;
+            color: #eef2ff;
+        }
+        /* 主题切换按钮 (右上角，位置不变) */
+        .theme-toggle {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: none;
+            border-radius: 2rem;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+        }
+        body.dark .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+        /* 菜单按钮 (左上角) */
+        .menu-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: none;
+            border-radius: 2rem;
+            padding: 6px 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+            font-weight: bold;
+        }
+        body.dark .menu-btn {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+        /* 昵称徽章 (左上角菜单按钮旁边) */
+        .nickname-badge {
+            position: fixed;
+            top: 12px;
+            left: 70px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            padding: 6px 12px;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        body.dark .nickname-badge {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+        /* 侧边栏遮罩 */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 150;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .sidebar-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #faf9f8;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            z-index: 200;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem 0;
+        }
+        body.dark .sidebar {
+            background: #1e1f2c;
+            border-right: 1px solid #334155;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar-header {
+            padding: 1rem 1rem 0.8rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        body.dark .sidebar-header {
+            border-bottom-color: #334155;
+        }
+        .channel-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .channel-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 0.5rem;
+            margin: 0 0.5rem;
+            color: #4b5563;
+        }
+        body.dark .channel-item {
+            color: #cbd5e1;
+        }
+        .channel-item.active {
+            background: #2563eb;
+            color: white;
+        }
+        .channel-item:hover:not(.active) {
+            background: rgba(0,0,0,0.1);
+        }
+        .channel-icon {
+            font-size: 1.3rem;
+        }
+        /* 聊天主区域 */
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding-top: 60px; /* 为顶部固定按钮留出空间 */
+        }
+        .chat-header {
+            padding: 0.8rem 1rem;
+            background: rgba(37,99,235,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .chat-header h2 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .message {
+            background: rgba(255,255,255,0.1);
+            border-radius: 1.2rem;
+            padding: 0.5rem 0.8rem;
+            width: fit-content;
+            max-width: 85%;
+            word-break: break-word;
+        }
+        body.dark .message {
+            background: #1e293b;
+        }
+        .message.self {
+            align-self: flex-end;
+            background: #2563eb;
+            color: white;
+        }
+        .message-meta {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            margin-bottom: 0.2rem;
+            cursor: pointer;
+        }
+        .message-text {
+            font-size: 0.9rem;
+        }
+        .input-area {
+            padding: 0.8rem;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            gap: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .message-input {
+            flex: 1;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 2rem;
+            padding: 0.6rem 1rem;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .send-btn {
+            background: #2563eb;
+            border: none;
+            color: white;
+            padding: 0 1rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .send-btn:active { transform: scale(0.96); }
+        .status { text-align: center; font-size: 0.75rem; color: #64748b; padding: 0.5rem; }
+        /* 模态框适配移动端 */
+        .modal-mask {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-card {
+            background: #1e293b;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 90%;
+            width: 320px;
+            text-align: center;
+        }
+        .modal-card input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            border-radius: 2rem;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+        }
+        .modal-card button {
+            background: #2563eb;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        /* 电脑端适配 */
+        @media (min-width: 701px) {
+            .menu-btn { display: none; }
+            .sidebar-overlay { display: none; }
+            .sidebar {
+                position: relative;
+                left: 0;
+                width: 260px;
+                height: auto;
+                box-shadow: none;
+                background: rgba(0,0,0,0.2);
+                border-right: 1px solid rgba(255,255,255,0.1);
+            }
+            .chat-main {
+                padding-top: 0;
+            }
+            .nickname-badge {
+                position: fixed;
+                top: 1rem;
+                left: auto;
+                right: 5rem;
+                background: rgba(0,0,0,0.5);
+            }
+            .chat-app {
+                display: flex;
+                height: 100vh;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+        @media (max-width: 700px) {
+            .sidebar {
+                background: #faf9f8;
+            }
+            body.dark .sidebar {
+                background: #1e1f2c;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙 深色</button>
+    <div class="chat-app">
+        <!-- 侧边栏 -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">📡 聊天频道</div>
+            <div class="channel-list" id="channelList"></div>
+        </div>
+
+        <div class="chat-main">
+            <button class="menu-btn" id="menuBtn">☰</button>
+            <div class="nickname-badge" id="nicknameBadge"></div>
+            <div class="chat-header">
+                <h2 id="currentChannelName"># 加载中...</h2>
+            </div>
+            <div class="messages-area" id="messagesArea">
+                <div class="status">加载聊天记录中...</div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="messageInput" class="message-input" placeholder="输入消息..." maxlength="200" disabled>
+                <button id="sendBtn" class="send-btn" disabled>发送</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== Firebase 配置（请替换为你的）==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI5olf8vB0AbRH4Mb0ncHCrf9hoRGc_SA",
+            authDomain: "xg-108-1.firebaseapp.com",
+            databaseURL: "https://xg-108-1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "xg-108-1",
+            storageBucket: "xg-108-1.firebasestorage.app",
+            messagingSenderId: "749234550605",
+            appId: "1:749234550605:web:5af3ceb37a97565855a904",
+            measurementId: "G-3YEMZW2VFK"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ========== 用户身份管理 ==========
+        let currentUserId = null;
+        let currentNickname = null;
+        let lastNicknameChange = null;
+
+        function initUser() {
+            let uid = localStorage.getItem('star_user_id');
+            if (!uid) {
+                uid = 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+                localStorage.setItem('star_user_id', uid);
+            }
+            currentUserId = uid;
+            let nickname = localStorage.getItem('star_nickname');
+            let lastChange = localStorage.getItem('star_nickname_last_change');
+            if (lastChange) lastNicknameChange = parseInt(lastChange);
+            if (!nickname) {
+                showNicknameModal(true);
+            } else {
+                currentNickname = nickname;
+                updateNicknameBadge();
+                enableChat();
+            }
+        }
+        
+        function showNicknameModal(isFirst = false) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-mask';
+            modal.innerHTML = `
+                <div class="modal-card">
+                    <h3>${isFirst ? '✨ 欢迎来到星光聊天室' : '📝 修改昵称'}</h3>
+                    <p>请输入你的昵称（2-16个字符）</p>
+                    <input type="text" id="nicknameInputModal" maxlength="16" placeholder="昵称">
+                    <div id="nicknameError" style="color:#f97316; font-size:0.8rem; margin:0.5rem 0;"></div>
+                    <button id="nicknameConfirmBtn">确认</button>
+                    ${!isFirst ? '<button id="nicknameCancelBtn" style="background:#4b5563; margin-left:0.5rem;">取消</button>' : ''}
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const input = modal.querySelector('#nicknameInputModal');
+            const confirmBtn = modal.querySelector('#nicknameConfirmBtn');
+            const errorDiv = modal.querySelector('#nicknameError');
+            const confirmHandler = () => {
+                const newName = input.value.trim();
+                if (newName.length < 2 || newName.length > 16) {
+                    errorDiv.textContent = '昵称长度应为2-16个字符';
+                    return;
+                }
+                if (!isFirst && lastNicknameChange) {
+                    const now = Date.now();
+                    const daysPassed = (now - lastNicknameChange) / (1000 * 3600 * 24);
+                    if (daysPassed < 30) {
+                        const remaining = Math.ceil(30 - daysPassed);
+                        errorDiv.textContent = `距上次修改不足30天，还需等待 ${remaining} 天`;
+                        return;
+                    }
+                }
+                currentNickname = newName;
+                localStorage.setItem('star_nickname', currentNickname);
+                localStorage.setItem('star_nickname_last_change', Date.now().toString());
+                lastNicknameChange = Date.now();
+                updateNicknameBadge();
+                modal.remove();
+                enableChat();
+                database.ref('users/' + currentUserId).set({
+                    nickname: currentNickname,
+                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                });
+            };
+            confirmBtn.addEventListener('click', confirmHandler);
+            if (!isFirst) {
+                const cancelBtn = modal.querySelector('#nicknameCancelBtn');
+                cancelBtn.addEventListener('click', () => modal.remove());
+            }
+            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmHandler(); });
+        }
+        
+        function updateNicknameBadge() {
+            const badge = document.getElementById('nicknameBadge');
+            if (badge && currentNickname) {
+                badge.innerHTML = `👤 ${currentNickname} ✏️`;
+                badge.onclick = () => showNicknameModal(false);
+            }
+        }
+        
+        function enableChat() {
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+        }
+        
+        // ========== 多频道聊天 ==========
+        const channels = [
+            { id: 'general', name: '公共聊天', icon: '💬' },
+            { id: 'announcements', name: '公告', icon: '📢' },
+            { id: 'model-talk', name: '模型讨论', icon: '🎨' }
+        ];
+        let currentChannelId = 'general';
+        let messagesRef = null;
+        let messageListener = null;
+        
+        // 侧边栏控制
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function openSidebar() { sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); }
+        function closeSidebar() { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); }
+        if (menuBtn) menuBtn.addEventListener('click', openSidebar);
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+        
+        const channelListDiv = document.getElementById('channelList');
+        const messagesArea = document.getElementById('messagesArea');
+        const currentChannelNameSpan = document.getElementById('currentChannelName');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        function renderChannels() {
+            channelListDiv.innerHTML = '';
+            channels.forEach(ch => {
+                const chDiv = document.createElement('div');
+                chDiv.className = 'channel-item';
+                if (ch.id === currentChannelId) chDiv.classList.add('active');
+                chDiv.innerHTML = `<span class="channel-icon">${ch.icon}</span><span>${ch.name}</span>`;
+                chDiv.addEventListener('click', () => {
+                    switchChannel(ch.id);
+                    closeSidebar();
+                });
+                channelListDiv.appendChild(chDiv);
+            });
+        }
+        
+        function switchChannel(channelId) {
+            if (currentChannelId === channelId) return;
+            if (messageListener) {
+                messagesRef.off('child_added', messageListener);
+                messageListener = null;
+            }
+            currentChannelId = channelId;
+            messagesArea.innerHTML = '<div class="status">加载聊天记录中...</div>';
+            document.querySelectorAll('.channel-item').forEach((el, idx) => {
+                if (channels[idx].id === channelId) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+            const channel = channels.find(c => c.id === channelId);
+            currentChannelNameSpan.innerHTML = `${channel.icon} ${channel.name}`;
+            setupMessageListener();
+        }
+        
+        function setupMessageListener() {
+            const channelPath = `channels/${currentChannelId}/messages`;
+            messagesRef = database.ref(channelPath);
+            messageListener = messagesRef.on('child_added', (snapshot) => {
+                const msg = snapshot.val();
+                displayMessage(msg);
+            });
+        }
+        
+        function showUserInfo(uid, nickname) {
+            alert(`用户：${nickname}\nID：${uid}`);
+        }
+        
+        function displayMessage(msg) {
+            const existingDiv = document.getElementById(`msg-${msg.id}`);
+            if (existingDiv) return;
+            if (messagesArea.querySelector('.status') && messagesArea.children.length === 1) {
+                messagesArea.innerHTML = '';
+            }
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.id = `msg-${msg.id}`;
+            if (msg.uid === currentUserId) messageDiv.classList.add('self');
+            const timeStr = new Date(msg.timestamp).toLocaleTimeString();
+            messageDiv.innerHTML = `
+                <div class="message-meta" data-uid="${msg.uid}" data-nickname="${escapeHtml(msg.nickname)}">${escapeHtml(msg.nickname)} · ${timeStr}</div>
+                <div class="message-text">${escapeHtml(msg.text)}</div>
+            `;
+            const meta = messageDiv.querySelector('.message-meta');
+            meta.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const uid = meta.getAttribute('data-uid');
+                const nickname = meta.getAttribute('data-nickname');
+                showUserInfo(uid, nickname);
+            });
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+        
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // 频率限制
+        let lastSendTime = 0;
+        let sendCount = 0;
+        let rateLimitTimer = null;
+        
+        async function sendMessage() {
+            if (!currentNickname) {
+                alert('请先设置昵称');
+                return;
+            }
+            const text = messageInput.value.trim();
+            if (!text) return;
+            
+            const now = Date.now();
+            if (now - lastSendTime < 60000) {
+                sendCount++;
+                if (sendCount > 10) {
+                    alert('发送过快，请稍后再试（每分钟最多10条）');
+                    return;
+                }
+            } else {
+                sendCount = 1;
+                lastSendTime = now;
+                if (rateLimitTimer) clearTimeout(rateLimitTimer);
+                rateLimitTimer = setTimeout(() => { sendCount = 0; }, 60000);
+            }
+            
+            const msgId = Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+            const newMessage = {
+                id: msgId,
+                uid: currentUserId,
+                nickname: currentNickname,
+                text: text,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            const channelPath = `channels/${currentChannelId}/messages`;
+            try {
+                await database.ref(channelPath).child(msgId).set(newMessage);
+                messageInput.value = '';
+                messageInput.focus();
+            } catch (err) {
+                console.error(err);
+                alert('发送失败，请稍后重试');
+            }
+        }
+        
+        function initChat() {
+            renderChannels();
+            setupMessageListener();
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        }
+        
+        // 主题切换
+        const toggle = document.getElementById('themeToggle');
+        const storedTheme = localStorage.getItem('chatTheme');
+        if (storedTheme === 'dark') {
+            document.body.classList.add('dark');
+            toggle.innerHTML = '☀️ 浅色';
+        }
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('chatTheme', isDark ? 'dark' : 'light');
+            toggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
+        });
+        
+        initUser();
+        initChat();
+    </script>
+</body>
+</html>
