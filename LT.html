@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>星光聊天室 · 为测试版本</title>
+    <title>星光聊天室 · 测试版本</title>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -21,7 +21,7 @@
             background: #0a0c10;
             color: #eef2ff;
         }
-        /* 主题切换按钮 (右上角，位置不变) */
+        /* 主题切换按钮 (右上角) */
         .theme-toggle {
             position: fixed;
             top: 12px;
@@ -40,86 +40,116 @@
             background: rgba(255,255,255,0.2);
             color: #facc15;
         }
-        /* 菜单按钮 (左上角) */
-        .menu-btn {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            border: none;
-            border-radius: 2rem;
-            padding: 6px 12px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            z-index: 100;
-            color: white;
-            font-weight: bold;
+        /* 电脑端（≥900px）固定左侧边栏 */
+        @media (min-width: 900px) {
+            .menu-btn { display: none; }
+            .sidebar-overlay { display: none; }
+            .sidebar {
+                position: relative;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                background: rgba(0,0,0,0.2);
+                border-right: 1px solid rgba(255,255,255,0.1);
+                transform: none;
+                box-shadow: none;
+                padding-top: 70px;
+            }
+            .chat-main {
+                padding-top: 0;
+            }
+            .chat-app {
+                display: flex;
+                height: 100vh;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            .nickname-badge {
+                position: fixed;
+                top: 12px;
+                left: auto;
+                right: 100px;
+                background: rgba(0,0,0,0.5);
+                padding: 4px 12px;
+                border-radius: 2rem;
+                font-size: 0.8rem;
+            }
+            body.dark .nickname-badge {
+                background: rgba(255,255,255,0.2);
+            }
         }
-        body.dark .menu-btn {
-            background: rgba(255,255,255,0.2);
-            color: #facc15;
+        /* 移动端（<900px）侧边栏滑出 + 按钮显示 */
+        @media (max-width: 899px) {
+            .menu-btn {
+                position: fixed;
+                top: 12px;
+                left: 12px;
+                background: rgba(0,0,0,0.6);
+                backdrop-filter: blur(8px);
+                border: none;
+                border-radius: 2rem;
+                padding: 6px 12px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                z-index: 100;
+                color: white;
+                font-weight: bold;
+            }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                width: 280px;
+                height: 100%;
+                background: #faf9f8;
+                box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+                z-index: 200;
+                transition: left 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                padding: 1rem 0;
+            }
+            body.dark .sidebar {
+                background: #1e1f2c;
+                border-right: 1px solid #334155;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                backdrop-filter: blur(4px);
+                z-index: 150;
+                visibility: hidden;
+                opacity: 0;
+                transition: 0.2s;
+            }
+            .sidebar-overlay.active {
+                visibility: visible;
+                opacity: 1;
+            }
+            .nickname-badge {
+                position: fixed;
+                top: 12px;
+                left: 70px;
+                background: rgba(0,0,0,0.5);
+                backdrop-filter: blur(8px);
+                padding: 4px 12px;
+                border-radius: 2rem;
+                font-size: 0.75rem;
+                z-index: 100;
+                color: white;
+            }
+            .chat-main {
+                padding-top: 60px;
+            }
         }
-        /* 昵称徽章 (左上角菜单按钮旁边) */
-        .nickname-badge {
-            position: fixed;
-            top: 12px;
-            left: 70px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px);
-            padding: 6px 12px;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            z-index: 100;
-            color: white;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        body.dark .nickname-badge {
-            background: rgba(255,255,255,0.2);
-            color: #facc15;
-        }
-        /* 侧边栏遮罩 */
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            z-index: 150;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.2s;
-        }
-        .sidebar-overlay.active {
-            visibility: visible;
-            opacity: 1;
-        }
-        /* 侧边栏 */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: #faf9f8;
-            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
-            z-index: 200;
-            transition: left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            padding: 1rem 0;
-        }
-        body.dark .sidebar {
-            background: #1e1f2c;
-            border-right: 1px solid #334155;
-        }
-        .sidebar.active {
-            left: 0;
-        }
+        /* 侧边栏公共样式 */
         .sidebar-header {
             padding: 1rem 1rem 0.8rem;
             font-weight: bold;
@@ -160,10 +190,11 @@
         }
         /* 聊天主区域 */
         .chat-main {
+            flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
             height: 100vh;
-            padding-top: 60px; /* 为顶部固定按钮留出空间 */
         }
         .chat-header {
             padding: 0.8rem 1rem;
@@ -240,7 +271,6 @@
         }
         .send-btn:active { transform: scale(0.96); }
         .status { text-align: center; font-size: 0.75rem; color: #64748b; padding: 0.5rem; }
-        /* 模态框适配移动端 */
         .modal-mask {
             position: fixed;
             top:0; left:0; width:100%; height:100%;
@@ -278,55 +308,14 @@
             cursor: pointer;
             font-size: 0.9rem;
         }
-        /* 电脑端适配 */
-        @media (min-width: 701px) {
-            .menu-btn { display: none; }
-            .sidebar-overlay { display: none; }
-            .sidebar {
-                position: relative;
-                left: 0;
-                width: 260px;
-                height: auto;
-                box-shadow: none;
-                background: rgba(0,0,0,0.2);
-                border-right: 1px solid rgba(255,255,255,0.1);
-            }
-            .chat-main {
-                padding-top: 0;
-            }
-            .nickname-badge {
-                position: fixed;
-                top: 1rem;
-                left: auto;
-                right: 5rem;
-                background: rgba(0,0,0,0.5);
-            }
-            .chat-app {
-                display: flex;
-                height: 100vh;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            .theme-toggle {
-                top: 1rem;
-                right: 1rem;
-            }
-        }
-        @media (max-width: 700px) {
-            .sidebar {
-                background: #faf9f8;
-            }
-            body.dark .sidebar {
-                background: #1e1f2c;
-            }
-        }
     </style>
 </head>
 <body>
     <button class="theme-toggle" id="themeToggle">🌙 深色</button>
     <div class="chat-app">
-        <!-- 侧边栏 -->
+        <!-- 侧边栏遮罩（仅移动端） -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <!-- 左侧频道栏 -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">📡 聊天频道</div>
             <div class="channel-list" id="channelList"></div>
@@ -349,7 +338,7 @@
     </div>
 
     <script>
-        // ========== Firebase 配置（请替换为你的）==========
+        // ========== Firebase 配置（请替换为你的配置）==========
         const firebaseConfig = {
             apiKey: "AIzaSyBI5olf8vB0AbRH4Mb0ncHCrf9hoRGc_SA",
             authDomain: "xg-108-1.firebaseapp.com",
@@ -462,14 +451,22 @@
         let messagesRef = null;
         let messageListener = null;
         
-        // 侧边栏控制
+        // 侧边栏控制（仅移动端生效，电脑端按钮隐藏）
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
-        function openSidebar() { sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); }
-        function closeSidebar() { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); }
-        if (menuBtn) menuBtn.addEventListener('click', openSidebar);
-        if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                sidebarOverlay.classList.add('active');
+            });
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
         
         const channelListDiv = document.getElementById('channelList');
         const messagesArea = document.getElementById('messagesArea');
@@ -486,7 +483,11 @@
                 chDiv.innerHTML = `<span class="channel-icon">${ch.icon}</span><span>${ch.name}</span>`;
                 chDiv.addEventListener('click', () => {
                     switchChannel(ch.id);
-                    closeSidebar();
+                    // 移动端切换后关闭侧边栏
+                    if (window.innerWidth < 900) {
+                        sidebar.classList.remove('active');
+                        sidebarOverlay.classList.remove('active');
+                    }
                 });
                 channelListDiv.appendChild(chDiv);
             });
@@ -557,7 +558,7 @@
             });
         }
         
-        // 频率限制
+        // 频率限制：每分钟10条
         let lastSendTime = 0;
         let sendCount = 0;
         let rateLimitTimer = null;
