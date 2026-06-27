@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>星光监测 · 服务状态</title>
+    <script defer src="https://cn.vercount.one/js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #faf9f8;
+            color: #1a1a1a;
+            transition: background 0.3s, color 0.3s;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+        body.dark {
+            background: #0a0c10;
+            color: #eef2ff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        body.dark .top-bar {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+        .back-btn {
+            background: #4b5563;
+            color: white;
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .theme-toggle {
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: white;
+        }
+        body.dark .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+        .card {
+            background: white;
+            border-radius: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        body.dark .card {
+            background: #1e293b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        body.dark .card-header {
+            border-bottom-color: rgba(255,255,255,0.05);
+        }
+        .card-content {
+            padding: 1.5rem;
+        }
+        .service-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        body.dark .service-item {
+            border-bottom-color: #334155;
+        }
+        .service-name {
+            font-weight: 600;
+            min-width: 130px;
+        }
+        .service-url {
+            font-size: 0.7rem;
+            color: #64748b;
+            word-break: break-all;
+            flex: 2;
+            margin-right: 1rem;
+        }
+        .status-badge {
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .status-online { background: #10b981; color: white; }
+        .status-offline { background: #ef4444; color: white; }
+        .status-unknown { background: #6b7280; color: white; }
+        .refresh-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .info-text {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .btn-small {
+            background: #4b5563;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        /* 资金显示（纯只读，无编辑功能） */
+        .funds-display {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #10b981;
+            text-align: center;
+            padding: 0.5rem 0;
+            letter-spacing: 1px;
+        }
+        .funds-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-top: 2rem;
+        }
+        @media (max-width: 640px) {
+            .service-item { flex-direction: column; align-items: flex-start; }
+            .service-url { margin-right: 0; }
+            .funds-display { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <a href="index.html" class="back-btn">← 返回主页</a>
+            <button class="theme-toggle" id="themeToggle">🌙 深色</button>
+        </div>
+
+        <!-- 服务状态卡片 -->
+        <div class="card">
+            <div class="card-header">🔌 后端服务接口状态</div>
+            <div class="card-content">
+                <div id="serviceList" class="service-list">
+                    <!-- 动态生成后端列表 -->
+                </div>
+                <div class="refresh-control">
+                    <div>
+                        <span class="info-text">自动检测间隔：</span>
+                        <select id="intervalSelect">
+                            <option value="60">1分钟</option>
+                            <option value="300" selected>5分钟</option>
+                            <option value="600">10分钟</option>
+                        </select>
+                    </div>
+                    <div>
+                        <span id="lastCheckTime" class="info-text">未检测</span>
+                        <button id="manualCheckBtn" class="btn-small">🔄 立即检测</button>
+                    </div>
+                </div>
+                <div class="info-text" style="margin-top: 0.5rem;">💡 服务接口URL在代码中配置，页面仅展示状态，不提供修改入口。</div>
+            </div>
+        </div>
+
+        <!-- 资金展示卡片（纯只读） -->
+        <div class="card">
+            <div class="card-header">💰 剩余资金</div>
+            <div class="card-content">
+                <div class="funds-label">当前余额（固定数值）</div>
+                <div class="funds-display" id="fundsDisplay">¥114514.00</div>
+                <div class="info-text" style="text-align:center; margin-top:0.5rem;">💡 资金为固定值，如需修改请联系管理员修改代码。</div>
+            </div>
+        </div>
+
+        <!-- 访问趋势（折叠） -->
+        <div class="card">
+            <div class="card-header" style="cursor: pointer;" id="trendHeader">📈 访问趋势（近7天） ▼</div>
+            <div id="trendContent" class="card-content">
+                <canvas id="trendChart" style="max-height: 280px;"></canvas>
+                <div class="info-text">📊 每日数据自动记录，趋势图基于本地存储。</div>
+            </div>
+        </div>
+
+        <div class="footer">🌟 星光监测 · 服务状态 | 资金固定显示，不可编辑</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // ========== 配置区（管理员在此修改后端 URL） ==========
+        // 预设后端列表：名称 和 对应的 localStorage key（或直接写死URL）
+        // 默认值（管理员可在这里填写自己的URL）
+        const DEFAULT_SERVICES = [
+            { name: '📤 模型投稿接口', urlKey: 'submit_api_url', defaultUrl: '' },
+            { name: '🗳️ 原作者反馈接口', urlKey: 'feedback_api_url', defaultUrl: '' }
+        ];
+
+        // 读取实际URL（优先使用 localStorage，否则使用默认）
+        function getServiceUrl(service) {
+            const stored = localStorage.getItem(service.urlKey);
+            if (stored) return stored;
+            return service.defaultUrl;
+        }
+
+        let services = [];
+        function buildServices() {
+            services = DEFAULT_SERVICES.map(s => ({
+                name: s.name,
+                urlKey: s.urlKey,
+                url: getServiceUrl(s)
+            }));
+        }
+
+        // 渲染列表
+        function renderServices() {
+            const container = document.getElementById('serviceList');
+            container.innerHTML = '';
+            services.forEach((svc, idx) => {
+                const div = document.createElement('div');
+                div.className = 'service-item';
+                div.innerHTML = `
+                    <div class="service-name">${escapeHtml(svc.name)}</div>
+                    <div class="service-url" title="${escapeHtml(svc.url)}">${svc.url ? truncateUrl(svc.url) : '未配置'}</div>
+                    <div><span class="status-badge status-unknown" id="status-${idx}">检测中</span></div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        function truncateUrl(url) {
+            if (!url) return '未配置';
+            return url.length > 50 ? url.substring(0, 47) + '…' : url;
+        }
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        // 检测单个服务
+        async function checkService(url) {
+            if (!url) return false;
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+                await fetch(url, { method: 'HEAD', signal: controller.signal });
+                clearTimeout(timeout);
+                return true;
+            } catch (e) {
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 5000);
+                    await fetch(url, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+                    clearTimeout(timeout);
+                    return true;
+                } catch (e2) {
+                    return false;
+                }
+            }
+        }
+
+        async function refreshAllStatus() {
+            for (let i = 0; i < services.length; i++) {
+                const svc = services[i];
+                const statusSpan = document.getElementById(`status-${i}`);
+                if (statusSpan) {
+                    const isOnline = await checkService(svc.url);
+                    statusSpan.className = `status-badge ${isOnline ? 'status-online' : 'status-offline'}`;
+                    statusSpan.innerText = isOnline ? '在线' : '离线';
+                }
+            }
+            document.getElementById('lastCheckTime').innerHTML = `上次检测：${new Date().toLocaleTimeString()}`;
+        }
+
+        // 自动检测
+        let autoTimer = null;
+        function startAutoCheck() {
+            if (autoTimer) clearInterval(autoTimer);
+            const intervalSec = parseInt(document.getElementById('intervalSelect').value);
+            autoTimer = setInterval(refreshAllStatus, intervalSec * 1000);
+        }
+
+        // 手动刷新
+        document.getElementById('manualCheckBtn').addEventListener('click', refreshAllStatus);
+        document.getElementById('intervalSelect').addEventListener('change', startAutoCheck);
+
+        // ========== 折叠/展开 ==========
+        let trendCollapsed = false;
+        const trendHeader = document.getElementById('trendHeader');
+        const trendContent = document.getElementById('trendContent');
+        trendHeader.addEventListener('click', () => {
+            trendCollapsed = !trendCollapsed;
+            trendContent.style.display = trendCollapsed ? 'none' : 'block';
+            trendHeader.innerHTML = trendCollapsed ? '📈 访问趋势（近7天） ▶' : '📈 访问趋势（近7天） ▼';
+        });
+
+        // ========== 资金固定显示（无编辑功能） ==========
+        // 资金数值直接写在这里，任何人都无法通过页面修改
+        const FIXED_FUNDS = 114514.00;
+        document.getElementById('fundsDisplay').innerText = `¥${FIXED_FUNDS.toFixed(2)}`;
+
+        // ========== 访问趋势（简化版） ==========
+        let chart = null;
+        function getLast7Days() {
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                days.push(`${d.getMonth()+1}/${d.getDate()}`);
+            }
+            return days;
+        }
+        function updateChart() {
+            const history = JSON.parse(localStorage.getItem('trend_history') || '{}');
+            const days = getLast7Days();
+            const pvData = [];
+            const uvData = [];
+            for (let i = 0; i < days.length; i++) {
+                const dateStr = `${new Date().getFullYear()}-${days[i].split('/')[0]}-${days[i].split('/')[1]}`;
+                const dayData = history[dateStr];
+                pvData.push(dayData ? dayData.pv : 0);
+                uvData.push(dayData ? dayData.uv : 0);
+            }
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: days,
+                    datasets: [
+                        { label: '总访问量 (PV)', data: pvData, borderColor: '#3b82f6', tension: 0.3 },
+                        { label: '访客数 (UV)', data: uvData, borderColor: '#10b981', tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+        }
+        function recordDailyData() {
+            const today = new Date().toISOString().slice(0,10);
+            let history = JSON.parse(localStorage.getItem('trend_history') || '{}');
+            const pvSpan = document.getElementById('busuanzi_value_site_pv');
+            const uvSpan = document.getElementById('busuanzi_value_site_uv');
+            let pv = pvSpan ? parseInt(pvSpan.innerText) || 0 : 0;
+            let uv = uvSpan ? parseInt(uvSpan.innerText) || 0 : 0;
+            if (pv === 0 && uv === 0) {
+                setTimeout(recordDailyData, 5000);
+                return;
+            }
+            if (!history[today]) {
+                history[today] = { pv, uv };
+                localStorage.setItem('trend_history', JSON.stringify(history));
+                updateChart();
+            }
+        }
+        function scheduleDaily() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            const msToTomorrow = tomorrow - now;
+            setTimeout(() => {
+                recordDailyData();
+                scheduleDaily();
+            }, msToTomorrow);
+        }
+        recordDailyData();
+        scheduleDaily();
+        setTimeout(() => updateChart(), 1000);
+
+        // ========== 主题切换 ==========
+        const themeToggle = document.getElementById('themeToggle');
+        const storedTheme = localStorage.getItem('monitorTheme');
+        if (storedTheme === 'dark') {
+            document.body.classList.add('dark');
+            themeToggle.innerHTML = '☀️ 浅色';
+        }
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('monitorTheme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
+        });
+
+        // ========== 初始化 ==========
+        buildServices();
+        renderServices();
+        startAutoCheck();
+        refreshAllStatus();
+
+        // 管理员可通过控制台修改后端URL（但页面不提供UI）
+        console.log('管理员可执行: localStorage.setItem("submit_api_url", "新的URL"); 然后刷新页面');
+        console.log('资金固定金额: 可在代码中修改 FIXED_FUNDS 变量');
+    </script>
+</body>
+</html>
