@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>忧郁猫猫 · 星光商店</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #faf9f8;
+            color: #1a1a1a;
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.5;
+        }
+        body.dark {
+            background: #0a0c10;
+            color: #eef2ff;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+        }
+        body.dark .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .back-nav { margin-bottom: 2rem; }
+        .back-nav a { color: #4b5563; text-decoration: none; font-weight: 500; }
+        body.dark .back-nav a { color: #9ca3af; }
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+        .gallery { display: flex; flex-direction: column; gap: 1rem; }
+        .main-img { width: 100%; border-radius: 2rem; background: #e5e7eb; }
+        .thumb-list { display: flex; gap: 1rem; overflow-x: auto; }
+        .thumb { width: 80px; height: 80px; border-radius: 1rem; object-fit: cover; cursor: pointer; border: 2px solid transparent; }
+        .thumb.active { border-color: #2563eb; }
+        .info-section h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .badge { display: inline-block; background: #e0e7ff; color: #1e40af; padding: 0.2rem 0.8rem; border-radius: 2rem; font-size: 0.8rem; }
+        body.dark .badge { background: #2d3a5e; color: #a5f3fc; }
+        .price { font-size: 1.8rem; font-weight: 700; color: #2563eb; margin: 1rem 0; }
+        .description { margin: 1.5rem 0; line-height: 1.7; color: #334155; }
+        body.dark .description { color: #cbd5e1; }
+        .specs { background: #f1f5f9; padding: 1.2rem; border-radius: 1.5rem; margin: 1.5rem 0; }
+        body.dark .specs { background: #1e293b; }
+        .btn-group { display: flex; gap: 1rem; margin-top: 2rem; }
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .btn-outline { background: transparent; border: 1px solid #2563eb; color: #2563eb; }
+        body.dark .btn-outline { border-color: #a5f3fc; color: #a5f3fc; }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+        }
+        body.dark .modal-card { background: #1e1f2c; }
+        .modal-card input, .modal-card textarea {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+        body.dark .modal-card input, body.dark .modal-card textarea {
+            background: #0f172a;
+            border-color: #334155;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .product-detail { grid-template-columns: 1fr; gap: 2rem; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙 深色</button>
+    <div class="container">
+        <div class="back-nav"><a href="123456.html">← 返回商店首页</a></div>
+
+        <div class="product-detail">
+            <div class="gallery">
+                <!-- 替换为毛毛的展示图 (建议使用1:1比例) -->
+                <img id="mainImg" class="main-img" src="YY1.webp" alt="毛毛预览">
+                <div class="thumb-list">
+                    <img class="thumb active" src="YY1.webp" data-big="YY1.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="YY2.webp" data-big="YY2.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="YY3.webp" data-big="YY3.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="YY4.webp" data-big="YY4.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="YY5.webp" data-big="YY5.webp" onclick="changeImage(this)">
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h1>🧸 忧郁猫猫(复刻)</h1>
+                <div class="badge">🔮 抑郁系 · 坚强中二</div>
+                <div class="price">🔥 基本定价 24</div>
+                <div class="price">✨ 体积小巧 · 安卓适配</div>
+                <div class="description">
+                    一个被生活反复折磨却依然倔强的双马尾kipfel<br>
+                    ✨ **抑郁系风格**：表情柔和带一点丧，但眼神里有光<br>
+                    ✨ **头灯**：打开后缓慢亮起，伴随柔和音效，可照亮周围环境（VRChat 实时光源）<br>
+                    ✨ **眼罩**：遮住一只眼睛，中二感拉满（可切换）<br>
+                    ✨ **双马尾**：可自由选择（目前仅有一种，后续可扩展）<br>
+                    ✨ **表情系统**：使用 FaceEmo 插件，表情细腻且可定制<br>
+                    ✨ **适配平台**：PC / 安卓一体机 (体积小，性能友好)
+                    
+                </div>
+                <div class="specs">
+                    <p><strong>📌 模型特点</strong> : 体积小（PC约 14MB），完全适配安卓一体机中低负载</p>
+                    <p><strong>💡 头灯</strong> : 真实光源，附带音效，打开时缓慢亮起</p>
+                    <p><strong>🎨 表情</strong> : FaceEmo 插件驱动，可支持自定义表情</p>
+                    <p><strong>🧩 额外功能</strong> : 后续可免费添加发型切换、服装变体等</p>
+                    <p><strong>🪬 特殊标注</strong> : 该模型为投稿复刻作品，如果您是原作者可以向我们返馈我们将会停止售卖</p>
+                    <p><strong>🎁 三自定义</strong> : 售后内拥有三次自由定义插件/贴图/物品</p>
+               
+                </div>
+             <div class="btn-group">
+                    <a href="https://m.tb.cn/h.RTzsUnl?tk=xWyE5BfuEyx" target="_blank" class="btn">👉 前往闲鱼购买</a>
+                    <button class="btn btn-outline" id="consultBtn">📝 定制/咨询/购买</button>
+                </div>
+                <p style="font-size:0.8rem; margin-top:1rem; color:#64748b;">亲亲即使抑郁也要好好活着啦，爱你呀❤️</p>
+            </div>
+          
+        </div>
+    </div>
+
+    <!-- 咨询弹窗 -->
+    <div id="modal" class="modal">
+        <div class="modal-card">
+            <h3>🐱 忧郁猫猫 · 已开售</h3>
+            <form id="inquiryForm">
+                <input type="text" id="name" placeholder="你的昵称" required>
+                <input type="text" id="contact" placeholder="QQ / 微信号" required>
+                <textarea id="remark" rows="3" placeholder="留言（如想要的颜色、服装风格、平台等）"></textarea>
+                <button type="submit" class="btn" style="width:100%">提交意向</button>
+                <button type="button" class="btn-outline" id="closeModal" style="margin-top:0.5rem; width:100%">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const toggle = document.getElementById('themeToggle');
+        const stored = localStorage.getItem('shopTheme');
+        if (stored === 'dark') {
+            document.body.classList.add('dark');
+            toggle.innerHTML = '☀️ 浅色';
+        }
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('shopTheme', isDark ? 'dark' : 'light');
+            toggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
+        });
+
+        function changeImage(el) {
+            const big = el.getAttribute('data-big');
+            document.getElementById('mainImg').src = big;
+            document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+        window.changeImage = changeImage;
+
+        const modal = document.getElementById('modal');
+        const consultBtn = document.getElementById('consultBtn');
+        const closeModal = document.getElementById('closeModal');
+        consultBtn.onclick = () => modal.classList.add('active');
+        closeModal.onclick = () => modal.classList.remove('active');
+        modal.onclick = (e) => { if(e.target === modal) modal.classList.remove('active'); };
+
+        // 使用Google的后端（YY）
+        const BACKEND_URL = '后端地址';
+        const form = document.getElementById('inquiryForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const remark = document.getElementById('remark').value.trim();
+            if (!name || !contact) return alert('请填写昵称和联系方式');
+            try {
+                const res = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ product: '毛毛模型', name, contact, remark })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('预定意向已登记！上线后会第一时间通知您～');
+                    modal.classList.remove('active');
+                    form.reset();
+                } else throw new Error();
+            } catch(err) {
+                alert('网络错误，请稍后重试');
+            }
+        };
+    </script>
+</body>
+</html>

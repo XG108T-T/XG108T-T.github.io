@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>模型投稿 · 星光商店</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #faf9f8;
+            color: #1a1a1a;
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.5;
+        }
+        body.dark {
+            background: #0a0c10;
+            color: #eef2ff;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+        }
+        body.dark .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .back-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .back-nav a {
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        body.dark .back-nav a {
+            color: #9ca3af;
+        }
+        .feedback-btn {
+            background: #ef4444;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            color: white !important;
+            display: inline-block;
+        }
+        .card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        body.dark .card {
+            background: #1e293b;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .sub {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 1.5rem;
+            border: 1px solid #cbd5e1;
+            background: #f9f9f9;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        body.dark input, body.dark textarea {
+            background: #0f172a;
+            border-color: #334155;
+            color: white;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .image-upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        body.dark .image-upload-area {
+            border-color: #334155;
+        }
+        .image-upload-area:hover {
+            border-color: #2563eb;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 1rem;
+            margin-top: 0.5rem;
+        }
+        .upload-status {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: #64748b;
+        }
+        .btn-submit {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .btn-submit:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .submissions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin: 2rem 0 1rem;
+            flex-wrap: wrap;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .sub-card {
+            background: white;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        body.dark .sub-card {
+            background: #1e293b;
+        }
+        .sub-card:hover {
+            transform: translateY(-4px);
+        }
+        .sub-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #e5e7eb;
+        }
+        .sub-content {
+            padding: 0.8rem;
+        }
+        .sub-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        .sub-author {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-bottom: 0.4rem;
+        }
+        body.dark .sub-author {
+            color: #94a3b8;
+        }
+        .sub-desc {
+            font-size: 0.75rem;
+            color: #334155;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        body.dark .sub-desc {
+            color: #cbd5e1;
+        }
+        .load-more {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .load-btn {
+            background: #4b5563;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .load-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #2563eb;
+            transition: width 0.3s;
+        }
+        .empty-list {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+        @media (max-width: 640px) {
+            .container { padding: 1rem; }
+            .card { padding: 1.5rem; }
+            .grid { gap: 1rem; }
+            .back-nav { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+            .back-nav div:first-child { text-align: center; }
+            .feedback-btn { text-align: center; display: block; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙 深色</button>
+    <div class="container">
+        <div class="back-nav">
+            <div><a href="123456.html">← 返回商店首页</a></div>
+            <div><a href="TGL.html" class="feedback-btn">📢 原作者反馈</a></div>
+        </div>
+
+        <!-- 投稿表单卡片 -->
+        <div class="card">
+            <h1>📤 模型投稿</h1>
+            <div class="sub">🟢 你可以将你见到过的模型在这里进行投稿，我们将会对该模型进行复刻，但并不会把此模型进行公开<br>🟡 注意：为了尊重原作者，我们会在此基础上添加一些额外的东西并且仅会复刻90%左右<br>🔴 如果原作者在我们这里反馈，我们将会停止对该模型的售卖，后续的投稿也将不会再对他进行复刻</div>
+            <form id="submitForm">
+                <div class="form-group">
+                    <label>模型名称 *</label>
+                    <input type="text" id="modelName" placeholder="例：某某" required>
+                </div>
+                <div class="form-group">
+                    <label>投稿昵称 *</label>
+                    <input type="text" id="authorName" placeholder="你的昵称" required>
+                </div>
+                <div class="form-group">
+                    <label>联系方式（QQ/微信） *</label>
+                    <input type="text" id="contact" placeholder="用于后续联系" required>
+                </div>
+                <div class="form-group">
+                    <label>模型简介 *</label>
+                    <textarea id="description" rows="4" placeholder="介绍模型特点、适用平台等" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>上传图片（可选，建议上传展示图）</label>
+                    <div class="image-upload-area" id="uploadArea">
+                        <input type="file" id="imageFile" accept="image/*" style="display: none;">
+                        <div id="uploadPrompt">📸 点击选择图片</div>
+                        <img id="imagePreview" class="image-preview" style="display: none;">
+                        <div id="uploadStatus" class="upload-status"></div>
+                    </div>
+                    <input type="hidden" id="imageUrl" value="">
+                </div>
+                <button type="submit" class="btn-submit" id="submitBtn">提交投稿</button>
+            </form>
+        </div>
+
+        <!-- 投稿列表区域 -->
+        <div class="submissions-header">
+            <h2>📋 用户投稿列表</h2>
+            <span style="font-size:0.8rem; color:#64748b;">社区推荐，我们会评估复刻</span>
+        </div>
+        <div id="submissionsGrid" class="grid">
+            <div class="empty-list">加载中...</div>
+        </div>
+        <div class="load-more" id="loadMoreContainer" style="display: none;">
+            <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+            <button class="load-btn" id="loadMoreBtn">加载更多</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== 配置 ==========
+        // 注：IMGBB_API_KEY 已移至后端，前端不再需要
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzo_qp73iaWDjBuXkxAoBm9U2zK0hXgZRcAKHFIW3edp80KDfYjyoOKrcbbnemWpK80/exec';  // 
+
+        // ========== 全局变量 ==========
+        let allSubmissions = [];
+        let displayedCount = 10;
+        let isLoading = false;
+
+        // ========== 主题切换 ==========
+        const toggle = document.getElementById('themeToggle');
+        const stored = localStorage.getItem('shopTheme');
+        if (stored === 'dark') {
+            document.body.classList.add('dark');
+            toggle.innerHTML = '☀️ 浅色';
+        }
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('shopTheme', isDark ? 'dark' : 'light');
+            toggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
+        });
+
+        // ========== 图片上传（通过后端中转） ==========
+        const fileInput = document.getElementById('imageFile');
+        const uploadArea = document.getElementById('uploadArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const imageUrlInput = document.getElementById('imageUrl');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 先显示预览
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                imagePreview.src = ev.target.result;
+                imagePreview.style.display = 'block';
+                document.getElementById('uploadPrompt').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+
+            // 将图片转为 Base64（去掉前缀）
+            const base64Reader = new FileReader();
+            base64Reader.onload = async (ev) => {
+                const base64Data = ev.target.result.split(',')[1]; // 去掉 data:image/...;base64,
+
+                uploadStatus.textContent = '上传中...';
+                uploadStatus.style.color = '#facc15';
+
+                try {
+                    // 调用后端图片上传接口（POST 请求，携带 action=upload）
+                    const response = await fetch(BACKEND_URL + '?action=upload', {
+                        method: 'POST',
+                        mode: 'cors',
+                        body: JSON.stringify({ image: base64Data })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        imageUrlInput.value = result.url;
+                        uploadStatus.textContent = '✅ 图片已上传';
+                        uploadStatus.style.color = '#10b981';
+                    } else {
+                        throw new Error(result.error || '上传失败');
+                    }
+                } catch (err) {
+                    uploadStatus.textContent = '❌ 上传失败，可稍后重试';
+                    uploadStatus.style.color = '#ef4444';
+                    imageUrlInput.value = '';
+                }
+            };
+            base64Reader.readAsDataURL(file);
+        });
+
+        // ========== 投稿表单提交 ==========
+        const form = document.getElementById('submitForm');
+        const submitBtn = document.getElementById('submitBtn');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const modelName = document.getElementById('modelName').value.trim();
+            const authorName = document.getElementById('authorName').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const imageUrl = imageUrlInput.value.trim();
+            if (!modelName || !authorName || !contact || !description) {
+                alert('请填写所有带 * 的字段');
+                return;
+            }
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify({ modelName, author: authorName, contact, description, imageUrl, timestamp: new Date().toISOString() })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('投稿成功！感谢你的分享，我们会尽快审核～');
+                    form.reset();
+                    imagePreview.style.display = 'none';
+                    document.getElementById('uploadPrompt').style.display = 'block';
+                    uploadStatus.textContent = '';
+                    imageUrlInput.value = '';
+                    await loadAllSubmissions();
+                } else {
+                    alert('提交失败，请稍后重试');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('网络错误，请检查网络后重试');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交投稿';
+            }
+        };
+
+        // ========== 加载所有投稿 ==========
+        async function loadAllSubmissions() {
+            const grid = document.getElementById('submissionsGrid');
+            grid.innerHTML = '<div class="empty-list">加载中...</div>';
+            try {
+                const response = await fetch(BACKEND_URL);
+                const data = await response.json();
+                if (!data.submissions || data.submissions.length === 0) {
+                    grid.innerHTML = '<div class="empty-list">暂无投稿，快来推荐你喜欢的模型吧～</div>';
+                    document.getElementById('loadMoreContainer').style.display = 'none';
+                    return;
+                }
+                allSubmissions = data.submissions.sort((a,b) => new Date(b['时间']) - new Date(a['时间']));
+                displayedCount = 10;
+                renderSubmissions();
+                document.getElementById('loadMoreContainer').style.display = allSubmissions.length > displayedCount ? 'block' : 'none';
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div class="empty-list">❌ 加载失败，请稍后刷新</div>';
+            }
+        }
+
+        function renderSubmissions() {
+            const grid = document.getElementById('submissionsGrid');
+            const showItems = allSubmissions.slice(0, displayedCount);
+            if (showItems.length === 0) {
+                grid.innerHTML = '<div class="empty-list">暂无投稿</div>';
+                return;
+            }
+            grid.innerHTML = showItems.map(item => `
+                <div class="sub-card">
+                    ${item['图片链接'] ? `<img class="sub-img" src="${escapeHtml(item['图片链接'])}" alt="${escapeHtml(item['模型名称'])}" loading="lazy">` : '<div class="sub-img" style="background:#2d3748; display:flex; align-items:center; justify-content:center;">🖼️ 无图</div>'}
+                    <div class="sub-content">
+                        <div class="sub-title">${escapeHtml(item['模型名称'])}</div>
+                        <div class="sub-author">推荐人：${escapeHtml(item['作者'])}</div>
+                        <div class="sub-desc">${escapeHtml(item['简介']).substring(0, 80)}${escapeHtml(item['简介']).length > 80 ? '…' : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+            const percent = (displayedCount / allSubmissions.length) * 100;
+            const fill = document.getElementById('progressFill');
+            if (fill) fill.style.width = percent + '%';
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (displayedCount >= allSubmissions.length) {
+                loadMoreBtn.textContent = '已全部加载';
+                loadMoreBtn.disabled = true;
+            } else {
+                loadMoreBtn.textContent = '加载更多';
+                loadMoreBtn.disabled = false;
+            }
+        }
+
+        function loadMore() {
+            if (isLoading) return;
+            if (displayedCount >= allSubmissions.length) return;
+            isLoading = true;
+            const btn = document.getElementById('loadMoreBtn');
+            btn.disabled = true;
+            btn.textContent = '加载中...';
+            setTimeout(() => {
+                displayedCount = Math.min(displayedCount + 10, allSubmissions.length);
+                renderSubmissions();
+                isLoading = false;
+            }, 300);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        document.getElementById('loadMoreBtn').addEventListener('click', loadMore);
+        loadAllSubmissions();
+
+        if (BACKEND_URL === 'YOUR_APPS_SCRIPT_URL') {
+            alert('请先配置后端 URL（在代码中修改 BACKEND_URL）');
+        }
+    </script>
+</body>
+</html>

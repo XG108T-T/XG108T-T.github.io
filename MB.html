@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>莫本猫猫 · 星光商店</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #faf9f8;
+            color: #1a1a1a;
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.5;
+        }
+        body.dark {
+            background: #0a0c10;
+            color: #eef2ff;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+        }
+        body.dark .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: #facc15;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .back-nav {
+            margin-bottom: 2rem;
+        }
+        .back-nav a {
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        body.dark .back-nav a {
+            color: #9ca3af;
+        }
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .main-img {
+            width: 100%;
+            border-radius: 2rem;
+            background: #e5e7eb;
+        }
+        .thumb-list {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+        }
+        .thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 1rem;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .thumb.active {
+            border-color: #2563eb;
+        }
+        .info-section h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin: 1rem 0;
+        }
+        .extra-service {
+            background: #f0f4ff;
+            border-radius: 1.5rem;
+            padding: 0.8rem 1.2rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        body.dark .extra-service {
+            background: #1e2a3e;
+        }
+        .extra-service label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .extra-service span {
+            background: #2563eb;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+        }
+        .badge {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #1e40af;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+        }
+        body.dark .badge {
+            background: #2d3a5e;
+            color: #a5f3fc;
+        }
+        .description {
+            margin: 1.5rem 0;
+            line-height: 1.7;
+            color: #334155;
+        }
+        body.dark .description {
+            color: #cbd5e1;
+        }
+        .specs {
+            background: #f1f5f9;
+            padding: 1.2rem;
+            border-radius: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        body.dark .specs {
+            background: #1e293b;
+        }
+        .specs p {
+            margin: 0.5rem 0;
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #2563eb;
+            color: #2563eb;
+        }
+        body.dark .btn-outline {
+            border-color: #a5f3fc;
+            color: #a5f3fc;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+        }
+        body.dark .modal-card {
+            background: #1e1f2c;
+        }
+        .modal-card input, .modal-card textarea {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+        body.dark .modal-card input,
+        body.dark .modal-card textarea {
+            background: #0f172a;
+            border-color: #334155;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .product-detail {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙 深色</button>
+    <div class="container">
+        <div class="back-nav"><a href="123456.html">← 返回商店首页</a></div>
+
+        <div class="product-detail">
+            <!-- 图片区加图片然后加图片会吧？ -->
+            <div class="gallery">
+                <img id="mainImg" class="main-img" src="MB1.webp" alt="莫本猫猫">
+                <div class="thumb-list">
+                    <img class="thumb active" src="MB1.webp" data-big="MB1.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="MB2.webp" data-big="MB2.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="MB3.webp" data-big="MB3.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="MB4.webp" data-big="MB4.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="MB5.webp" data-big="MB5.webp" onclick="changeImage(this)">
+                    <img class="thumb" src="MB6.webp" data-big="MB6.webp" onclick="changeImage(this)">
+                </div>
+            </div>
+
+            <!-- 信息区改文字会吧？ -->
+            <div class="info-section">
+                <h1>🐱 莫本猫猫</h1>
+                <div class="badge">🔥 在售限时降价 · 闲鱼现货</div>
+                <div class="price"> 💰¥44-58 </div>
+
+                <!-- 追加服务选项（不突兀的兄弟） -->
+                <div class="extra-service">
+                    <label>
+                        <input type="checkbox" id="extraCheckbox">
+                        🆕 +20元 售后延长至30天 可自定义次数增加到十次 优先处理问题 处理插队
+                    </label>
+                    <span>为支持/服务可选</span>
+                </div>
+
+                <div class="description">
+                    软萌猫娘风格 VRC 模型 kipfel 适配 VRChat / 虚拟直播。<br>
+                    
+                    ✨ 部分插件进行魔改<br>
+                    ✨ 纯绿不添加任何ERP/低俗插件<br>
+                    ✨ 部分衣服纯手工制作 <br>
+                    ✨ 带原版六套可爱服装 <br>
+                    ✨ 支持 Unity 工程文件，可二次修改（技术问题暂不售卖原文件）<br>
+            
+                </div>
+                <div class="specs">
+                    <p><strong>📦 包含内容</strong> : 模型上传＋售后＋自定义</p>
+                    <p><strong>🎨 名牌自定</strong> : 免费更改，可图片</p>
+                    <p><strong>🕒 交付时间</strong> : 购买后24-72小时内发联系将联系您</p>
+                    <p><strong>🔧 售后服务</strong> : 7天技术支持，免费修bug</p>
+                    <p><strong>🎁 三自定义</strong> : 售后内拥有三次自由定义插件/贴图/物品</p>
+                </div>
+                <div class="btn-group">
+                    <a href="https://m.tb.cn/h.RTzsUnl?tk=xWyE5BfuEyx" target="_blank" class="btn">👉 前往闲鱼购买</a>
+                    <button class="btn btn-outline" id="consultBtn">📝 定制/咨询/购买</button>
+                </div>
+                <p style="font-size:0.8rem; margin-top:1rem; color:#64748b;">※ 如需附加服务，请在闲鱼下单时备注“+20元服务”，或通过咨询表单告知。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 咨询弹窗 -->
+    <div id="modal" class="modal">
+        <div class="modal-card">
+            <h3>📞 咨询 · 莫本猫猫</h3>
+            <form id="inquiryForm">
+                <input type="text" id="name" placeholder="你的昵称" required>
+                <input type="text" id="contact" placeholder="QQ / 微信号" required>
+                <textarea id="remark" rows="3" placeholder="留言 (比如需求、问题等)"></textarea>
+                <button type="submit" class="btn" style="width:100%">发送咨询</button>
+                <button type="button" class="btn-outline" id="closeModal" style="margin-top:0.5rem; width:100%">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换
+        const toggle = document.getElementById('themeToggle');
+        const stored = localStorage.getItem('shopTheme');
+        if (stored === 'dark') {
+            document.body.classList.add('dark');
+            toggle.innerHTML = '☀️ 浅色';
+        }
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('shopTheme', isDark ? 'dark' : 'light');
+            toggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
+        });
+
+        // 图片切换
+        function changeImage(el) {
+            const big = el.getAttribute('data-big');
+            document.getElementById('mainImg').src = big;
+            document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+        window.changeImage = changeImage;
+
+        // 咨询弹窗逻辑
+        const modal = document.getElementById('modal');
+        const consultBtn = document.getElementById('consultBtn');
+        const closeModal = document.getElementById('closeModal');
+        consultBtn.onclick = () => modal.classList.add('active');
+        closeModal.onclick = () => modal.classList.remove('active');
+        modal.onclick = (e) => { if(e.target === modal) modal.classList.remove('active'); };
+
+        // 该为表单提交 (后端URL请替换，如果是自己手动添加的话，请不要更改任何一处地方别怪我没有提醒过，你后端的代码，不要乱碰也不要乱搞)
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxwNAZidG0f5yNkgRDDyCxYyjbxMcJtizXoAYyB02m5xHTG97aBukLa04clr5HyMpoJ/exec';
+        const form = document.getElementById('inquiryForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            let remark = document.getElementById('remark').value.trim();
+            const extraChecked = document.getElementById('extraCheckbox').checked;
+            if (extraChecked) {
+                remark = remark ? remark + ' [附加服务+20元]' : '[附加服务+20元]';
+            }
+            if (!name || !contact) return alert('请填写昵称和联系方式');
+            try {
+                const res = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ product: '莫本猫猫模型', name, contact, remark })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('咨询已发送！我们会尽快联系你～');
+                    modal.classList.remove('active');
+                    form.reset();
+                    document.getElementById('extraCheckbox').checked = false;
+                } else throw new Error();
+            } catch(err) {
+                alert('网络错误，请稍后重试');
+            }
+        };
+    </script>
+</body>
+</html>
