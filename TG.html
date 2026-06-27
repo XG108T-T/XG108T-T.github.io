@@ -318,10 +318,8 @@
 
     <script>
         // ========== 配置 ==========
-        // 注：IMGBB_API_KEY 已移至后端，前端不再需要
-        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzo_qp73iaWDjBuXkxAoBm9U2zK0hXgZRcAKHFIW3edp80KDfYjyoOKrcbbnemWpK80/exec';
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzP60hkUEkUfHQZ70K33DhFgeuoUZ-ANB9iJaqxnYdd6r2brQpAGpbkTuiziLDILSkW/exec';
 
-        // ========== 全局变量 ==========
         let allSubmissions = [];
         let displayedCount = 10;
         let isLoading = false;
@@ -340,7 +338,7 @@
             toggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
         });
 
-        // ========== 图片上传（通过后端中转） ==========
+        // ========== 图片上传 ==========
         const fileInput = document.getElementById('imageFile');
         const uploadArea = document.getElementById('uploadArea');
         const imagePreview = document.getElementById('imagePreview');
@@ -353,7 +351,6 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // 先显示预览
             const reader = new FileReader();
             reader.onload = (ev) => {
                 imagePreview.src = ev.target.result;
@@ -362,21 +359,18 @@
             };
             reader.readAsDataURL(file);
 
-            // 将图片转为 Base64（去掉前缀）
             const base64Reader = new FileReader();
             base64Reader.onload = async (ev) => {
-                const base64Data = ev.target.result.split(',')[1]; // 去掉 data:image/...;base64,
-
+                const base64Data = ev.target.result.split(',')[1];
                 uploadStatus.textContent = '上传中...';
                 uploadStatus.style.color = '#facc15';
 
                 try {
-                    // ========== 修改点1：图片上传加了 headers ==========
                     const response = await fetch(BACKEND_URL + '?action=upload', {
                         method: 'POST',
                         mode: 'cors',
                         headers: {
-                            'Content-Type': 'application/json'   // 👈 加了这行
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ image: base64Data })
                     });
@@ -414,12 +408,11 @@
             submitBtn.disabled = true;
             submitBtn.textContent = '提交中...';
             try {
-                // ========== 修改点2：投稿提交也加了 headers ==========
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     mode: 'cors',
                     headers: {
-                        'Content-Type': 'application/json'   // 👈 加了这行
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ modelName, author: authorName, contact, description, imageUrl, timestamp: new Date().toISOString() })
                 });
@@ -444,12 +437,24 @@
             }
         };
 
+        // ========== 修复：escapeHtml 安全处理 ==========
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            if (typeof str !== 'string') str = String(str);
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
         // ========== 加载所有投稿 ==========
         async function loadAllSubmissions() {
             const grid = document.getElementById('submissionsGrid');
             grid.innerHTML = '<div class="empty-list">加载中...</div>';
             try {
-                const response = await fetch(BACKEND_URL);
+                const response = await fetch(BACKEND_URL + '?action=list');
                 const data = await response.json();
                 if (!data.submissions || data.submissions.length === 0) {
                     grid.innerHTML = '<div class="empty-list">暂无投稿，快来推荐你喜欢的模型吧～</div>';
@@ -508,16 +513,6 @@
                 renderSubmissions();
                 isLoading = false;
             }, 300);
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
         }
 
         document.getElementById('loadMoreBtn').addEventListener('click', loadMore);

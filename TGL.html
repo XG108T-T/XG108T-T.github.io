@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>原作者反馈 · 星光商店</title>
     <style>
-        /* 样式保持不变，略去重复，你可以直接复制之前的样式 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -174,8 +173,8 @@
     <div class="container">
         <div class="top-bar">
             <div class="nav-links">
-                <a href="shop.html">← 商店首页</a>
-                <a href="submit-model.html">📤 投稿模型</a>
+                <a href="123456.html">← 商店首页</a>
+                <a href="TG.html">📤 投稿模型</a>
                 <a href="submissions.html">📋 投稿列表</a>
             </div>
         </div>
@@ -220,8 +219,8 @@
 
     <script>
         // ========== 配置 ==========
-        // 现在只需要一个统一的 BACKEND_URL
-        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxpBMxg189GrO13D3khMUgf6-EJZIIJo1ynAc5yH4l8O9LrG8PAPiz_bsqhKI70MUTzXg/exec';
+        // 使用统一的投稿后端（已包含图片上传和反馈存储功能）
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzP60hkUEkUfHQZ70K33DhFgeuoUZ-ANB9iJaqxnYdd6r2brQpAGpbkTuiziLDILSkW/exec';
 
         // ========== 主题切换 ==========
         const toggle = document.getElementById('themeToggle');
@@ -237,7 +236,7 @@
             toggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
         });
 
-        // ========== 图片上传（通过后端中转） ==========
+        // ========== 图片上传（通过后端中转，已添加 headers） ==========
         const fileInput = document.getElementById('imageFile');
         const uploadArea = document.getElementById('uploadArea');
         const imagePreview = document.getElementById('imagePreview');
@@ -262,13 +261,16 @@
             // 转为 base64 并发送到后端
             const base64Reader = new FileReader();
             base64Reader.onload = async (ev) => {
-                const base64Data = ev.target.result.split(',')[1]; // 去掉 data:image/...;base64,
+                const base64Data = ev.target.result.split(',')[1];
                 uploadStatus.textContent = '上传中...';
                 uploadStatus.style.color = '#facc15';
                 try {
                     const response = await fetch(BACKEND_URL + '?action=upload', {
                         method: 'POST',
                         mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({ image: base64Data })
                     });
                     const result = await response.json();
@@ -338,7 +340,7 @@
             }
         });
 
-        // ========== 表单提交 ==========
+        // ========== 反馈提交（已添加 headers） ==========
         const form = document.getElementById('feedbackForm');
         const submitBtn = document.getElementById('submitBtn');
         form.onsubmit = async (e) => {
@@ -367,6 +369,9 @@
                 const response = await fetch(BACKEND_URL + '?action=feedback', {
                     method: 'POST',
                     mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ modelName, contact, reason, imageUrl })
                 });
                 const result = await response.json();
@@ -394,6 +399,7 @@
         // 加载模型列表
         loadModelList();
 
+        // 如果后端 URL 未配置（占位符），提示用户
         if (BACKEND_URL === 'YOUR_UNIFIED_APPS_SCRIPT_URL') {
             alert('请先配置统一的 BACKEND_URL（在代码中修改）');
         }

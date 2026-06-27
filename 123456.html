@@ -21,7 +21,6 @@
             background: #0a0c10;
             color: #eef2ff;
         }
-        /* 顶部导航栏 */
         .top-bar {
             max-width: 1200px;
             margin: 0 auto;
@@ -73,31 +72,15 @@
             background: rgba(255,255,255,0.2);
             color: #facc15;
         }
-        /* 商品网格公共样式 */
-        .shop-grid, .submissions-grid {
+
+        /* 官方商品网格 (竖向卡片) —— 保持不变 */
+        .shop-grid {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 2rem;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 2rem;
-        }
-        .section-title {
-            max-width: 1200px;
-            margin: 2rem auto 0;
-            padding: 0 2rem;
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        body.dark .section-title {
-            color: #e2e8f0;
-        }
-        .section-title small {
-            font-size: 0.9rem;
-            font-weight: normal;
-            color: #64748b;
-            margin-left: 0.5rem;
         }
         .product-card {
             background: white;
@@ -178,7 +161,175 @@
         body.dark .product-desc {
             color: #cbd5e1;
         }
-        /* 模态框详情 */
+
+        /* ========== 社区投稿卡片 (重新设计，简洁&自适应) ========== */
+        .submissions-grid {
+            max-width: 900px;          /* 限制最大宽度，居中显示 */
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .submission-card {
+            background: white;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            width: 100%;               /* 宽度100%撑满父容器 */
+        }
+        body.dark .submission-card {
+            background: #1e1f2c;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .submission-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        /* 左侧图片：1:1，固定尺寸但相对较小，圆角匹配 */
+        .submission-image {
+            flex: 0 0 120px;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            background: #e5e7eb;
+            border-radius: 1.5rem 0 0 1.5rem;
+            flex-shrink: 0;
+        }
+        body.dark .submission-image {
+            background: #2d2f3e;
+        }
+
+        .submission-noimg {
+            flex: 0 0 120px;
+            width: 120px;
+            height: 120px;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #94a3b8;
+            border-radius: 1.5rem 0 0 1.5rem;
+            flex-shrink: 0;
+        }
+        body.dark .submission-noimg {
+            background: #2d2f3e;
+            color: #64748b;
+        }
+
+        /* 右侧文字区域，填充剩余空间，紧凑排版 */
+        .submission-info {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            overflow: hidden;          /* 防止内容溢出 */
+        }
+        .submission-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        body.dark .submission-title {
+            color: #e2e8f0;
+        }
+        .submission-author {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        body.dark .submission-author {
+            color: #94a3b8;
+        }
+        .submission-desc {
+            font-size: 0.8rem;
+            color: #4b5563;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-height: 2.8em;          /* 保证两行高度 */
+        }
+        body.dark .submission-desc {
+            color: #cbd5e1;
+        }
+        .submission-badge {
+            display: inline-block;
+            margin-top: 0.2rem;
+            font-size: 0.6rem;
+            background: #e0e7ff;
+            color: #1e40af;
+            padding: 0.1rem 0.6rem;
+            border-radius: 2rem;
+            width: fit-content;
+            letter-spacing: 0.3px;
+        }
+        body.dark .submission-badge {
+            background: #2d3a5e;
+            color: #a5f3fc;
+        }
+
+        .section-title {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding: 0 2rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        body.dark .section-title {
+            color: #e2e8f0;
+        }
+        .section-title small {
+            font-size: 0.9rem;
+            font-weight: normal;
+            color: #64748b;
+            margin-left: 0.5rem;
+        }
+
+        .view-all-link {
+            max-width: 900px;
+            margin: 0.5rem auto 0;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        .view-all-link a {
+            display: inline-block;
+            padding: 0.5rem 2rem;
+            border-radius: 3rem;
+            background: rgba(0,0,0,0.04);
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        body.dark .view-all-link a {
+            background: rgba(255,255,255,0.06);
+            color: #cbd5e1;
+        }
+        .view-all-link a:hover {
+            background: rgba(37,99,235,0.1);
+            color: #2563eb;
+        }
+
+        /* 模态框 */
         .modal {
             position: fixed;
             top: 0;
@@ -232,31 +383,7 @@
             cursor: pointer;
             color: white;
         }
-        /* 查看全部投稿入口 */
-        .view-all-link {
-            max-width: 1200px;
-            margin: 0.5rem auto 0;
-            padding: 0 2rem;
-            text-align: center;
-        }
-        .view-all-link a {
-            display: inline-block;
-            padding: 0.5rem 2rem;
-            border-radius: 3rem;
-            background: rgba(0,0,0,0.04);
-            color: #4b5563;
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        body.dark .view-all-link a {
-            background: rgba(255,255,255,0.06);
-            color: #cbd5e1;
-        }
-        .view-all-link a:hover {
-            background: rgba(37,99,235,0.1);
-            color: #2563eb;
-        }
+
         .footer {
             text-align: center;
             padding: 2rem;
@@ -265,20 +392,96 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+
+        /* ========== 移动端适配 ========== */
         @media (max-width: 640px) {
-            .shop-grid, .submissions-grid { gap: 1rem; padding: 0 1rem; }
-            .top-bar { flex-direction: column; align-items: stretch; }
-            .nav-right { justify-content: space-between; }
+            .submissions-grid {
+                padding: 0 1rem;
+                gap: 0.8rem;
+            }
+            .submission-card {
+                border-radius: 1rem;
+                flex-wrap: nowrap;
+                min-height: auto;
+            }
+            .submission-image {
+                flex: 0 0 90px;
+                width: 90px;
+                height: 90px;
+                border-radius: 1rem 0 0 1rem;
+            }
+            .submission-noimg {
+                flex: 0 0 90px;
+                width: 90px;
+                height: 90px;
+                font-size: 1.8rem;
+                border-radius: 1rem 0 0 1rem;
+            }
+            .submission-info {
+                padding: 0.5rem 0.8rem;
+            }
+            .submission-title {
+                font-size: 0.95rem;
+                white-space: nowrap;
+            }
+            .submission-desc {
+                font-size: 0.7rem;
+                line-height: 1.3;
+                max-height: 2.6em;
+                -webkit-line-clamp: 2;
+            }
+            .submission-author {
+                font-size: 0.65rem;
+            }
+            .submission-badge {
+                font-size: 0.55rem;
+                padding: 0.05rem 0.5rem;
+            }
+            .view-all-link {
+                padding: 0 1rem;
+            }
+            .top-bar {
+                padding: 1rem 1rem 0.5rem;
+            }
+            .shop-grid {
+                padding: 0 1rem;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .submission-image {
+                flex: 0 0 70px;
+                width: 70px;
+                height: 70px;
+            }
+            .submission-noimg {
+                flex: 0 0 70px;
+                width: 70px;
+                height: 70px;
+                font-size: 1.4rem;
+            }
+            .submission-info {
+                padding: 0.3rem 0.6rem;
+            }
+            .submission-title {
+                font-size: 0.85rem;
+            }
+            .submission-desc {
+                font-size: 0.65rem;
+                max-height: 2.4em;
+                -webkit-line-clamp: 2;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 顶部导航栏 -->
+    <!-- 顶部导航 (与之前相同) -->
     <div class="top-bar">
         <div class="logo"><a href="123456.html">✨ 星光商店</a></div>
         <div class="nav-right">
             <a href="index.html">← 返回主页</a>
-            <a href="TG.html">📋 投稿列表</a>   <!-- 新增 -->
+            <a href="TG.html">📋 投稿列表</a>
             <button class="theme-toggle" id="themeToggle">🌙 深色</button>
         </div>
     </div>
@@ -292,8 +495,8 @@
                 <div class="product-badge">🔥 在售已降价 · 闲鱼可购</div>
                 <div class="product-price">¥44-58</div>
             </div>
-       </a>     
-            <a href="YY.html" class="product-card">
+        </a>     
+        <a href="YY.html" class="product-card">
             <img class="product-image" src="YY1.webp" alt="待定模型">
             <div class="product-info">
                 <div class="product-title">🧸 忧郁猫猫（复刻）</div>
@@ -308,7 +511,7 @@
                 <div class="product-badge">⚙️ 暂停制作</div>
                 <div class="product-price">突发事件停止制作</div>
             </div>
-             </a>
+        </a>
         <a href="666.html" class="product-card">
             <img class="product-image" src="111.webp" alt="待定模型">
             <div class="product-info">
@@ -316,7 +519,6 @@
                 <div class="product-badge">🪢 未制作</div>
                 <div class="product-price">公布待定</div>
             </div>
-            
         </a>
     </div>
 
@@ -329,12 +531,11 @@
         <div style="text-align: center; grid-column: 1/-1;">加载中...</div>
     </div>
 
-    <!-- 查看全部投稿入口（新增） -->
     <div class="view-all-link">
         <a href="TGL.html">⚠️ 投稿反馈 →</a>
     </div>
 
-    <!-- 详情模态框 -->
+    <!-- 模态框 -->
     <div id="detailModal" class="modal">
         <div class="modal-card">
             <button class="modal-close" id="modalCloseBtn">✕</button>
@@ -356,8 +557,7 @@
 
     <script>
         // ========== 配置 ==========
-        // 请替换为你的投稿后端 Apps Script URL（必须支持 GET 返回 submissions 数组）
-        const SUBMISSIONS_URL = 'https://script.google.com/macros/s/AKfycbzo_qp73iaWDjBuXkxAoBm9U2zK0hXgZRcAKHFIW3edp80KDfYjyoOKrcbbnemWpK80/exec';  // 后端
+        const SUBMISSIONS_URL = 'https://script.google.com/macros/s/AKfycbzP60hkUEkUfHQZ70K33DhFgeuoUZ-ANB9iJaqxnYdd6r2brQpAGpbkTuiziLDILSkW/exec';
 
         // ========== 主题切换 ==========
         const toggle = document.getElementById('themeToggle');
@@ -373,17 +573,29 @@
             toggle.innerHTML = isDark ? '☀️ 浅色' : '🌙 深色';
         });
 
+        // ========== 安全转义 ==========
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            if (typeof str !== 'string') str = String(str);
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
         // ========== 加载投稿数据 ==========
         let submissions = [];
         function loadSubmissions() {
             const grid = document.getElementById('submissionsGrid');
             grid.innerHTML = '<div style="text-align:center; grid-column:1/-1;">加载投稿中...</div>';
-            fetch(SUBMISSIONS_URL)
+            fetch(SUBMISSIONS_URL + '?action=list')
                 .then(res => res.json())
                 .then(data => {
                     if (data.submissions && data.submissions.length > 0) {
                         submissions = data.submissions.sort((a,b) => new Date(b['时间']) - new Date(a['时间']));
-                        renderSubmissions(submissions.slice(0, 6));
+                        renderSubmissions(submissions.slice(0, 10));
                     } else {
                         grid.innerHTML = '<div style="text-align:center; grid-column:1/-1;">暂无投稿，快来推荐你喜欢的模型吧～</div>';
                     }
@@ -401,18 +613,21 @@
                 return;
             }
             grid.innerHTML = items.map(item => `
-                <div class="product-card" data-index="${item['id'] || Math.random()}">
-                    ${item['图片链接'] ? `<img class="product-image" src="${escapeHtml(item['图片链接'])}" alt="${escapeHtml(item['模型名称'])}" loading="lazy">` : '<div class="product-image" style="background:#2d3748; display:flex; align-items:center; justify-content:center;">🖼️ 无图</div>'}
-                    <div class="product-info">
-                        <div class="product-title">${escapeHtml(item['模型名称'])}</div>
-                        <div class="product-author">推荐人：${escapeHtml(item['作者'])}</div>
-                        <div class="product-desc">${escapeHtml(item['简介']).substring(0, 60)}${escapeHtml(item['简介']).length > 60 ? '…' : ''}</div>
-                        <div class="product-badge">📌 社区投稿</div>
+                <div class="submission-card" data-index="${item['id'] || Math.random()}">
+                    ${item['图片链接'] 
+                        ? `<img class="submission-image" src="${escapeHtml(item['图片链接'])}" alt="${escapeHtml(item['模型名称'])}" loading="lazy">` 
+                        : `<div class="submission-noimg">🖼️</div>`
+                    }
+                    <div class="submission-info">
+                        <div class="submission-title">${escapeHtml(item['模型名称'])}</div>
+                        <div class="submission-author">推荐人：${escapeHtml(item['作者'])}</div>
+                        <div class="submission-author">介绍：${escapeHtml(item['简介'])}</div>
+                        <div class="submission-badge">📌 社区投稿</div>
                     </div>
                 </div>
             `).join('');
             // 绑定点击事件
-            document.querySelectorAll('#submissionsGrid .product-card').forEach((card, idx) => {
+            document.querySelectorAll('#submissionsGrid .submission-card').forEach((card, idx) => {
                 card.addEventListener('click', () => {
                     const item = items[idx];
                     openModal(item);
@@ -420,7 +635,7 @@
             });
         }
 
-        // 模态框相关
+        // ========== 模态框 ==========
         const modal = document.getElementById('detailModal');
         const modalClose = document.getElementById('modalCloseBtn');
         function openModal(item) {
@@ -434,19 +649,9 @@
         modalClose.addEventListener('click', () => modal.classList.remove('active'));
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        // 初始化加载
+        // ========== 启动 ==========
         if (SUBMISSIONS_URL === 'YOUR_APPS_SCRIPT_URL') {
-            console.warn('请先配置 SUBMISSIONS_URL 为你的投稿后端地址');
+            console.warn('请先配置 SUBMISSIONS_URL');
             document.getElementById('submissionsGrid').innerHTML = '<div style="text-align:center; grid-column:1/-1;">⚠️ 请先配置投稿后端 URL</div>';
         } else {
             loadSubmissions();
